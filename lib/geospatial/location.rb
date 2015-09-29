@@ -1,5 +1,5 @@
 
-module Geoquery
+module Geospatial
 	# This location is specifically relating to a WGS84 coordinate on Earth.
 	class Location
 		# WGS 84 semi-major axis constant in meters

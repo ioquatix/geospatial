@@ -18,13 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'geoquery/location'
+require 'geospatial/location'
 
-module Geoquery::LocationSpec
-	describe Geoquery::Location do
+module Geospatial::LocationSpec
+	describe Geospatial::Location do
 		it "compute the correct distance between two points" do
-			lake_tekapo = Geoquery::Location.new(-43.883, 170.516)
-			lake_alex = Geoquery::Location.new(-43.95, 170.45)
+			lake_tekapo = Geospatial::Location.new(-43.883, 170.516)
+			lake_alex = Geospatial::Location.new(-43.95, 170.45)
 			
 			expect(lake_alex.distance_from(lake_tekapo)).to be_within(10).of(9_130)
 		end

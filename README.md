@@ -1,16 +1,16 @@
-# Geoquery
+# Geospatial
 
-Geoquery provides abstractions for dealing with geographical locations efficiently.
+Geospatial provides abstractions for dealing with geographical locations efficiently.
 
-[![Build Status](https://secure.travis-ci.org/ioquatix/geoquery.png)](http://travis-ci.org/ioquatix/geoquery)
-[![Code Climate](https://codeclimate.com/github/ioquatix/geoquery.png)](https://codeclimate.com/github/ioquatix/geoquery)
-[![Coverage Status](https://coveralls.io/repos/ioquatix/geoquery/badge.svg)](https://coveralls.io/r/ioquatix/geoquery)
+[![Build Status](https://secure.travis-ci.org/ioquatix/geospatial.png)](http://travis-ci.org/ioquatix/geospatial)
+[![Code Climate](https://codeclimate.com/github/ioquatix/geospatial.png)](https://codeclimate.com/github/ioquatix/geospatial)
+[![Coverage Status](https://coveralls.io/repos/ioquatix/geospatial/badge.svg)](https://coveralls.io/r/ioquatix/geospatial)
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'geoquery'
+    gem 'geospatial'
 
 And then execute:
 
@@ -18,7 +18,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install geoquery
+    $ gem install geospatial
 
 ## Usage
 

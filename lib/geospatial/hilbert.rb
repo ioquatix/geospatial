@@ -1,5 +1,5 @@
 
-module Geoquery
+module Geospatial
 	class Hilbert
 		# Quadrants are numbered 0 to 3, and are in the following order:
 		# y

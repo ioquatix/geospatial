@@ -18,55 +18,55 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'geoquery/hilbert'
+require 'geospatial/hilbert'
 
-module Geoquery::HilbertSpec
-	describe Geoquery::Hilbert do
+module Geospatial::HilbertSpec
+	describe Geospatial::Hilbert do
 		it "base case should be identity" do
 			# The base case for our coordinate system:
-			expect(Geoquery::Hilbert.rotate(0, 0)).to be == 0
-			expect(Geoquery::Hilbert.rotate(0, 1)).to be == 1
-			expect(Geoquery::Hilbert.rotate(0, 2)).to be == 2
-			expect(Geoquery::Hilbert.rotate(0, 3)).to be == 3
+			expect(Geospatial::Hilbert.rotate(0, 0)).to be == 0
+			expect(Geospatial::Hilbert.rotate(0, 1)).to be == 1
+			expect(Geospatial::Hilbert.rotate(0, 2)).to be == 2
+			expect(Geospatial::Hilbert.rotate(0, 3)).to be == 3
 		end
 		
 		it "rotation is self-inverting" do
 			4.times do |rotation|
 				4.times do |quadrant|
 					# rotate(rotation, rotate(rotation, quadrant)) == quadrant
-					rotated = Geoquery::Hilbert.rotate(rotation, quadrant)
-					expect(Geoquery::Hilbert.rotate(rotation, rotated)).to be == quadrant
+					rotated = Geospatial::Hilbert.rotate(rotation, quadrant)
+					expect(Geospatial::Hilbert.rotate(rotation, rotated)).to be == quadrant
 				end
 			end
 		end
 		
 		it "compute the correct hash of order=0" do
-			expect(Geoquery::Hilbert.hash(0, 0, 0)).to be == 0
-			expect(Geoquery::Hilbert.hash(1, 0, 0)).to be == 1
-			expect(Geoquery::Hilbert.hash(1, 1, 0)).to be == 2
-			expect(Geoquery::Hilbert.hash(0, 1, 0)).to be == 3
+			expect(Geospatial::Hilbert.hash(0, 0, 0)).to be == 0
+			expect(Geospatial::Hilbert.hash(1, 0, 0)).to be == 1
+			expect(Geospatial::Hilbert.hash(1, 1, 0)).to be == 2
+			expect(Geospatial::Hilbert.hash(0, 1, 0)).to be == 3
 		end
 		
 		it "compute the correct hash of order=1" do
-			expect(Geoquery::Hilbert.hash(0, 0, 1)).to be == 0
-			expect(Geoquery::Hilbert.hash(1, 0, 1)).to be == 1
-			expect(Geoquery::Hilbert.hash(1, 1, 1)).to be == 2
-			expect(Geoquery::Hilbert.hash(0, 1, 1)).to be == 3
+			expect(Geospatial::Hilbert.hash(0, 0, 1)).to be == 0
+			expect(Geospatial::Hilbert.hash(1, 0, 1)).to be == 1
+			expect(Geospatial::Hilbert.hash(1, 1, 1)).to be == 2
+			expect(Geospatial::Hilbert.hash(0, 1, 1)).to be == 3
 			
-			expect(Geoquery::Hilbert.hash(0, 2, 1)).to be == 4
-			expect(Geoquery::Hilbert.hash(0, 3, 1)).to be == 5
-			expect(Geoquery::Hilbert.hash(1, 3, 1)).to be == 6
-			expect(Geoquery::Hilbert.hash(1, 2, 1)).to be == 7
+			expect(Geospatial::Hilbert.hash(0, 2, 1)).to be == 4
+			expect(Geospatial::Hilbert.hash(0, 3, 1)).to be == 5
+			expect(Geospatial::Hilbert.hash(1, 3, 1)).to be == 6
+			expect(Geospatial::Hilbert.hash(1, 2, 1)).to be == 7
 			
-			expect(Geoquery::Hilbert.hash(2, 2, 1)).to be == 8
-			expect(Geoquery::Hilbert.hash(2, 3, 1)).to be == 9
-			expect(Geoquery::Hilbert.hash(3, 3, 1)).to be == 10
-			expect(Geoquery::Hilbert.hash(3, 2, 1)).to be == 11
+			expect(Geospatial::Hilbert.hash(2, 2, 1)).to be == 8
+			expect(Geospatial::Hilbert.hash(2, 3, 1)).to be == 9
+			expect(Geospatial::Hilbert.hash(3, 3, 1)).to be == 10
+			expect(Geospatial::Hilbert.hash(3, 2, 1)).to be == 11
 			
-			expect(Geoquery::Hilbert.hash(3, 1, 1)).to be == 12
-			expect(Geoquery::Hilbert.hash(2, 1, 1)).to be == 13
-			expect(Geoquery::Hilbert.hash(2, 0, 1)).to be == 14
-			expect(Geoquery::Hilbert.hash(3, 0, 1)).to be == 15
+			expect(Geospatial::Hilbert.hash(3, 1, 1)).to be == 12
+			expect(Geospatial::Hilbert.hash(2, 1, 1)).to be == 13
+			expect(Geospatial::Hilbert.hash(2, 0, 1)).to be == 14
+			expect(Geospatial::Hilbert.hash(3, 0, 1)).to be == 15
 		end
 	end
 end
