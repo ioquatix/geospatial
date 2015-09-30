@@ -171,5 +171,64 @@ module Geospatial
 			
 			return x, y
 		end
+		
+		# Compute the bounds for a given normalized quadrant
+		def self.bounds_for(quadrant, origin, size)
+			half_size = [size[0] * 0.5, size[1] * 0.5]
+			
+			case quadrant
+			when 0
+				return origin, half_size
+			when 1
+				return [origin[0] + half_size[0], origin[1]], half_size
+			when 2
+				return [origin[0] + half_size[0], origin[1] + half_size[1]], half_size
+			when 3
+				return [origin[0], origin[1] + half_size[1]], half_size
+			else
+				raise ArgumentError.new("Invalid quadrant for computing bounds #{quadrant}")
+			end
+		end
+		
+		# Enumerate a depth first traversal of the hilbert curve from the top of the tree down.
+		def self.traverse(order, origin: [0, 0], size: [1, 1], &block)
+			# The initial rotation depends on the order:
+			rotation = order.even? ? A : B
+			value = 0
+			
+			if block_given?
+				self.traverse_recurse(order, rotation, value, origin, size, &block)
+			else
+				return to_enum(:traverse_recurse, order, rotation, value, origin, size, &block)
+			end
+		end
+		
+		def self.traverse_recurse(order, rotation, value, origin, size, &block)
+			# We can either traverse in prefix order or normalized quadrant order. I think prefix order is more useful since it generates a sorted output w.r.t prefix.
+			4.times do |prefix|
+				# Given the normalised quadrant, compute the prefix bits for the given quadrant for the given hilbert curve rotation:
+				quadrant = rotate(rotation, prefix)
+				
+				# Compute the bounds for the given quadrant:
+				child_origin, child_size = self.bounds_for(quadrant, origin, size)
+				
+				# These both do the same thing, not sure which one is faster:
+				child_value = (value << 2) | prefix
+				
+				# Given the current rotation and the prefix for the hilbert curve, compute the next rotation one level in:
+				child_rotation = next_rotation(rotation, prefix)
+				
+				#puts "quadrant=#{quadrant} child_origin=#{child_origin} child_size=#{child_size} child_value=#{child_value} order=#{order}"
+				
+				# We avoid calling traverse_recurse simply to hit the callback on the leaf nodes:
+				result = yield child_origin, child_size, (child_value << order*2), order
+				
+				if order > 0 and :skip != result
+					self.traverse_recurse(order - 1, child_rotation, child_value, child_origin, child_size, &block)
+				end
+			end
+			
+			return value
+		end
 	end
 end

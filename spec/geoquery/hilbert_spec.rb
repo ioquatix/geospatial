@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 require 'geospatial/hilbert'
+require_relative 'sorted'
 
 module Geospatial::HilbertSpec
 	describe Geospatial::Hilbert do
@@ -71,6 +72,21 @@ module Geospatial::HilbertSpec
 		
 		it "computes the correct unhash" do
 			expect(Geospatial::Hilbert.unhash(12)).to be == [3, 1]
+		end
+		
+		it "traverses and generates all prefixes" do
+			items = Geospatial::Hilbert.traverse(1).to_a
+			
+			# 4 items of order 1, 16 items of order 0.
+			expect(items.size).to be == (4 + 16)
+			
+			expect(items[0]).to be == [[0, 0], [0.5, 0.5], 0b0000, 1]
+			expect(items[5]).to be == [[0.0, 0.5], [0.5, 0.5], 0b0100, 1]
+			expect(items[10]).to be == [[0.5, 0.5], [0.5, 0.5], 0b1000, 1]
+			expect(items[15]).to be == [[0.5, 0], [0.5, 0.5], 0b1100, 1]
+			
+			prefixes = items.collect{|item| item[2]}
+			expect(prefixes).to be_sorted
 		end
 	end
 end
