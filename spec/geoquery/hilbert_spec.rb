@@ -40,14 +40,14 @@ module Geospatial::HilbertSpec
 			end
 		end
 		
-		it "compute the correct hash of order=0" do
+		it "computes the correct hash of order=0" do
 			expect(Geospatial::Hilbert.hash(0, 0, 0)).to be == 0
 			expect(Geospatial::Hilbert.hash(1, 0, 0)).to be == 1
 			expect(Geospatial::Hilbert.hash(1, 1, 0)).to be == 2
 			expect(Geospatial::Hilbert.hash(0, 1, 0)).to be == 3
 		end
 		
-		it "compute the correct hash of order=1" do
+		it "computes the correct hash of order=1" do
 			expect(Geospatial::Hilbert.hash(0, 0, 1)).to be == 0
 			expect(Geospatial::Hilbert.hash(1, 0, 1)).to be == 1
 			expect(Geospatial::Hilbert.hash(1, 1, 1)).to be == 2
@@ -67,6 +67,10 @@ module Geospatial::HilbertSpec
 			expect(Geospatial::Hilbert.hash(2, 1, 1)).to be == 13
 			expect(Geospatial::Hilbert.hash(2, 0, 1)).to be == 14
 			expect(Geospatial::Hilbert.hash(3, 0, 1)).to be == 15
+		end
+		
+		it "computes the correct unhash" do
+			expect(Geospatial::Hilbert.unhash(12)).to be == [3, 1]
 		end
 	end
 end

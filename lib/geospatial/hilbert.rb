@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 
 module Geospatial
-	class Hilbert
+	module Hilbert
 		# Quadrants are numbered 0 to 3, and are in the following order:
 		# y
 		# 1 | 3 | 2 |
@@ -100,7 +100,7 @@ module Geospatial
 		end
 		
 		def self.hash(x, y, order)
-			result = 0
+			value = 0
 			# The initial rotation depends on the order:
 			rotation = order.even? ? A : B
 			
@@ -112,14 +112,64 @@ module Geospatial
 				prefix = rotate(rotation, quadrant)
 				
 				# These both do the same thing, not sure which one is faster:
-				result = (result << 2) | prefix
+				value = (value << 2) | prefix
 				#result |= (rotated << (i * 2))
 				
 				# Given the current rotation and the prefix for the hilbert curve, compute the next rotation one level in:
 				rotation = next_rotation(rotation, prefix)
 			end
 			
-			return result
+			return value
+		end
+		
+		def self.updated_coordinate_for(quadrant, x, y)
+			x = x << 1
+			y = y << 1
+			
+			case quadrant
+			when 1
+				x += 1
+			when 2
+				x += 1
+				y += 1
+			when 3
+				y += 1
+			end
+			
+			return x, y
+		end
+		
+		# Gives the order of the hilbert curve, where order 0 is defined as a single iteration of the curve.
+		def self.order_of(value)
+			(value.bit_length + 1) / 2 - 1
+		end
+		
+		def self.unhash(value)
+			x = 0
+			y = 0
+			
+			rotation = A
+			
+			order = self.order_of(value)
+			
+			# The initial rotation depends on the order:
+			rotation = order.even? ? A : B
+			
+			order.downto(0) do |i|
+				# Extract the 2-bit prefix:
+				prefix = (value[i*2+1] << 1) | value[i*2]
+				
+				# Compute the normalized quadrant:
+				quadrant = self.rotate(rotation, prefix)
+				
+				# Compute the updated x,y coordinate for this level of the curve:
+				x, y = self.updated_coordinate_for(quadrant, x, y)
+				
+				# Compute the next rotation of the curve one level down the tree:
+				rotation = next_rotation(rotation, prefix)
+			end
+			
+			return x, y
 		end
 	end
 end
