@@ -19,5 +19,31 @@
 # THE SOFTWARE.
 
 module Geospatial
-	VERSION = "0.1.0"
+	class Sphere
+		def initialize(center, radius)
+			@center = center
+			@radius = radius
+		end
+		
+		attr :center
+		attr :radius
+		
+		def intersects(other)
+			case other
+			when Sphere
+				intersects_with_sphere(other)
+			else
+				raise UnimplementedError.new("Can't compute intersection of #{self.class} and #{other.class}")
+			end
+		end
+		
+		# This function needs to handle distances in space which wraps. It currently doesn't do that.
+		def distance_from_sphere(other_sphere)
+			other_sphere.center.distance_from(@center)
+		end
+		
+		def intersects_with_sphere(other)
+			return distance_from_sphere(other) <= (other.radius + self.radius)
+		end
+	end
 end

@@ -19,5 +19,10 @@
 # THE SOFTWARE.
 
 module Geospatial
-	VERSION = "0.1.0"
+	class AlignedBox
+		def initialize(origin, size)
+			@origin = origin
+			@size = size
+		end
+	end
 end
