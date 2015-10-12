@@ -1,4 +1,9 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in geospatial.gemspec
+# Specify your gem's dependencies in build.gemspec
 gemspec
+
+group :test do
+	gem 'simplecov'
+	gem 'coveralls', require: false
+end
