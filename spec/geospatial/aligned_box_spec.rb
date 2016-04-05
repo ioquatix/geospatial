@@ -27,5 +27,12 @@ module Geospatial::AlignedBoxSpec
 		it "compute integral points" do
 			expect(square.integral_offset([-1, -1], [4, 4])).to be == [0, 0]
 		end
+		
+		let(:new_zealand) {Geospatial::AlignedBox.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])}
+		let(:child) {Geospatial::AlignedBox.new(Vector[135.0, -67.5], Vector[45.0, 22.5])}
+		
+		it "should intersect" do
+			expect(new_zealand).to be_intersect(child)
+		end
 	end
 end

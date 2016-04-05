@@ -20,11 +20,12 @@
 
 require_relative 'location'
 require_relative 'aligned_box'
+require_relative 'prefix_set'
 
 module Geospatial
 	class Map
-		# Will use 60 bits to store hash:
-		ORDER = 30
+		# Will use order*2 bits to store hash:
+		DEFAULT_ORDER = 8
 		
 		class Point
 			def initialize(map, location)
@@ -39,9 +40,9 @@ module Geospatial
 			end
 		end
 		
-		EARTH_BOUNDS = AlignedBox.new(Vector[-180, -90], Vector[180, 90]).freeze
+		EARTH_BOUNDS = AlignedBox.new(Vector[-180, -90], Vector[360, 180]).freeze
 		
-		def initialize(bounds = EARTH_BOUNDS, order: ORDER)
+		def initialize(bounds = EARTH_BOUNDS, order: DEFAULT_ORDER)
 			@order = order
 			@scale = ([2**@order] * 2).freeze
 			
@@ -60,6 +61,8 @@ module Geospatial
 		
 		def << location
 			@points << Point.new(self, location)
+			
+			return self
 		end
 		
 		def count
@@ -70,15 +73,39 @@ module Geospatial
 			@points.sort_by!(&:hash)
 		end
 		
-		def query(bounding_box)
-			ranges = []
+		def query(region)
+			prefixes = prefixes_for(region)
 			
-			Hilbert.traverse(ORDER, origin: @bounds.origin, size: @bounds.size) do |child_origin, child_size, prefix, order|
-				child = AlignedBox.new(child_origin, child_size)
+			return prefixes.filter(@points)
+		end
+		
+		def prefixes_for(region)
+			prefixes = PrefixSet.new
+			
+			# puts "Searching for #{region.inspect} in origin=#{@bounds.origin} size=#{@bounds.size}..."
+			
+			Hilbert.traverse(@order, origin: @bounds.origin, size: @bounds.size) do |child_origin, child_size, prefix, order|
+				child = AlignedBox.new(Vector[*child_origin], Vector[*child_size])
 				
-				if bounding_box.overlaps(child)
+				# puts "Considering (order=#{order}) #{child.inspect}..."
+				
+				if region.intersects?(child)
+					if order == 0 # at bottom
+						puts "at bottom -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
+						prefixes.add(prefix, order); :skip
+					elsif region.contains?(child)
+						puts "contains child -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
+						prefixes.add(prefix, order); :skip
+					else
+						#puts "going deeper..."
+					end
+				else
+					#puts "out of bounds."
+					:skip
 				end
 			end
+			
+			return prefixes
 		end
 	end
 end

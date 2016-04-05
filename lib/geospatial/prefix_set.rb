@@ -1,4 +1,4 @@
-# Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2016, by Samuel G. D. Williams. <http://www.codeotaku.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,65 +18,61 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'matrix'
-
 module Geospatial
-	class AlignedBox
-		def self.from_bounds(min, max)
-			self.new(min, max-min)
+	class PrefixRange
+		def initialize(prefix, order)
+			@min = prefix
+			update_max(prefix, order)
 		end
 		
-		def initialize(origin, size)
-			@origin = origin
-			@size = size
-		end
-		
-		def dimensions
-			@origin.size
-		end
-		
-		attr :origin
-		attr :size
+		attr :min
+		attr :max
 		
 		def inspect
-			"#{self.class}(#{min.inspect} -> #{max.inspect})"
+			"#{min.to_s(2)}..#{max.to_s(2)}"
 		end
 		
-		def min
-			@origin
+		# Returns the new max if expansion was possible, or nil otherwise.
+		def expand!(prefix, order)
+			if @max < prefix and prefix == @max+1
+				update_max(prefix, order)
+			end
 		end
 		
-		def max
-			@max ||= @origin + @size
+		def include?(hash)
+			hash >= min and hash <= max
 		end
 		
-		def contains_point?(point)
-			dimensions.times do |i|
-				return false if point[i] < min[i] or point[i] >= max[i]
+		private
+		
+		def update_max(prefix, order)
+			# We set the RHS of the prefix to 1s, which is the maximum:
+			@max = prefix | ((1 << (order*2)) - 1)
+		end
+	end
+	
+	class PrefixSet
+		def initialize
+			@ranges = []
+		end
+		
+		attr :ranges
+		
+		def add(prefix, order)
+			if last = @ranges.last
+				raise ArgumentError.new("Cannot add non-sequential prefix") unless prefix > last.max
 			end
 			
-			return true
-		end
-		
-		def contains?(other)
-			contains_point?(other.min) && contains_point?(other.max)
-		end
-		
-		def intersects?(other)
-			dimensions.times do |i|
-				# Separating axis theorm, if the minimum of the other is past the maximum of self, or the maximum of other is less than the minimum of self, an intersection cannot occur.
-				if other.min[i] > self.max[i] or other.max[i] < self.min[i]
-					return false
-				end
+			unless last = @ranges.last and last.expand!(prefix, order)
+				@ranges << PrefixRange.new(prefix, order)
 			end
+		end
+		
+		def filter(objects)
+			puts @ranges.inspect
 			
-			return true
-		end
-		
-		def integral_offset(coordinate, scale)
-			dimensions.times.collect do |i|
-				Integer((coordinate[i] - @origin[i]).to_f / @size[i] * scale[i])
-			end
+			# This is a poor implementation.
+			objects.select{|object| puts object.hash.to_s(2); @ranges.any?{|range| range.include?(object.hash)}}
 		end
 	end
 end
