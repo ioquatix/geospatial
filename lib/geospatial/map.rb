@@ -21,11 +21,12 @@
 require_relative 'location'
 require_relative 'aligned_box'
 require_relative 'prefix_set'
+require_relative 'hilbert'
 
 module Geospatial
 	class Map
-		# Will use order*2 bits to store hash:
-		DEFAULT_ORDER = 8
+		# The order is the number of times to divide along each axis, i.e. 2**order discrete segments. Each division requires 2 bits, one for each longitude/latitude.
+		DEFAULT_ORDER = 4
 		
 		class Point
 			def initialize(map, location)
@@ -43,18 +44,24 @@ module Geospatial
 		EARTH_BOUNDS = AlignedBox.new(Vector[-180, -90], Vector[360, 180]).freeze
 		
 		def initialize(bounds = EARTH_BOUNDS, order: DEFAULT_ORDER)
+			raise ArgumentError("Order #{order} must be positive integer!") unless order >= 1
+			
 			@order = order
-			@scale = ([2**@order] * 2).freeze
+			@scale = 2**order
 			
 			@bounds = bounds
 			
 			@points = []
 		end
 		
+		attr :order
+		attr :bounds
 		attr :points
 		
 		def location_hash(location)
 			coordinates = @bounds.integral_offset(location.to_a, @scale)
+			
+			puts "Integral offset = #{coordinates} (#{@scale})"
 			
 			return Hilbert.hash(*coordinates, @order)
 		end

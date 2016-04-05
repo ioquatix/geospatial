@@ -28,7 +28,7 @@ module Geospatial::MapSpec
 		
 		let(:new_zealand) {Geospatial::AlignedBox.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])}
 		let(:australia) {Geospatial::AlignedBox.from_bounds(Vector[112.0, -45.0], Vector[155.0, -10.0])}
-
+		
 		it "should add points" do
 			subject << lake_tekapo
 			subject << lake_alex

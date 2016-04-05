@@ -224,7 +224,7 @@ module Geospatial
 				# We avoid calling traverse_recurse simply to hit the callback on the leaf nodes:
 				result = yield child_origin, child_size, (child_value << order*2), order
 				
-				if order > 0 and :skip != result
+				if order > 0 and result != :skip
 					self.traverse_recurse(order - 1, child_rotation, child_value, child_origin, child_size, &block)
 				end
 			end
