@@ -27,31 +27,47 @@ module Geospatial
 		ORDER = 30
 		
 		class Point
-			def initialize(location)
+			def initialize(map, location)
+				@map = map
 				@location = location
 			end
 			
 			attr :location
 			
 			def hash
-				@hash ||= Hilbert.hash(@location.latitude, @location.longitude, ORDER).freeze
+				@hash ||= @map.location_hash(@location).freeze
 			end
 		end
 		
 		EARTH_BOUNDS = AlignedBox.new(Vector[-180, -90], Vector[180, 90]).freeze
 		
-		def initialize(bounds = EARTH_BOUNDS)
+		def initialize(bounds = EARTH_BOUNDS, order: ORDER)
+			@order = order
+			@scale = ([2**@order] * 2).freeze
+			
 			@bounds = bounds
 			
 			@points = []
 		end
 		
-		def << point
-			@points << point
+		attr :points
+		
+		def location_hash(location)
+			coordinates = @bounds.integral_offset(location.to_a, @scale)
+			
+			return Hilbert.hash(*coordinates, @order)
+		end
+		
+		def << location
+			@points << Point.new(self, location)
+		end
+		
+		def count
+			@points.count
 		end
 		
 		def sort!
-			@points.sort_by(&:hash)
+			@points.sort_by!(&:hash)
 		end
 		
 		def query(bounding_box)

@@ -54,5 +54,11 @@ module Geospatial
 			
 			return true
 		end
+		
+		def integral_offset(coordinate, scale)
+			dimensions.times.collect do |i|
+				Integer((coordinate[i] - @origin[i]).to_f / @size[i] * scale[i])
+			end
+		end
 	end
 end

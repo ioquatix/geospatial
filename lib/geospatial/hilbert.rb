@@ -99,6 +99,7 @@ module Geospatial
 			end
 		end
 		
+		# x and y must be integers, between 0..(2**order-1)
 		def self.hash(x, y, order)
 			value = 0
 			# The initial rotation depends on the order:

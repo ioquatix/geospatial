@@ -53,6 +53,10 @@ module Geospatial
 			VALID_LONGITUDE.include?(longitude) and VALID_LATITUDE.include?(latitude)
 		end
 		
+		def to_a
+			[@longitude, @latitude, @altitude]
+		end
+		
 		def to_s
 			"#<Location longitude=#{@longitude.to_f} latitude=#{@latitude} altitude=#{@altitude.to_f}>"
 		end

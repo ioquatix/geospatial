@@ -18,15 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'geospatial/location'
+require 'geospatial/map'
 
-module Geospatial::LocationSpec
-	describe Geospatial::Location do
-		let(:lake_tekapo) {Geospatial::Location.new(170.516, -43.883)}
-		let(:lake_alex) {Geospatial::Location.new(170.45, -43.95)}
+module Geospatial::AlignedBoxSpec
+	describe Geospatial::AlignedBox do
+		let(:square) {Geospatial::AlignedBox.new(Vector[-1, -1], Vector[2, 2])}
 		
-		it "compute the correct distance between two points" do
-			expect(lake_alex.distance_from(lake_tekapo)).to be_within(10).of(9_130)
+		it "compute integral points" do
+			expect(square.integral_offset([-1, -1], [4, 4])).to be == [0, 0]
 		end
 	end
 end
