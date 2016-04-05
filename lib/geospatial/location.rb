@@ -35,32 +35,32 @@ module Geospatial
 		R2D = (180.0 / Math::PI)
 		D2R = (Math::PI / 180.0)
 
-		MIN_LATITUDE = -90.0 * D2R
-		MAX_LATITUDE = 90 * D2R
-		VALID_LATITUDE = MIN_LATITUDE...MAX_LATITUDE
-		
 		MIN_LONGITUDE = -180 * D2R
 		MAX_LONGITUDE = 180 * D2R
 		VALID_LONGITUDE = MIN_LONGITUDE...MAX_LONGITUDE
-		
-		def initialize(latitude, longitude, altitude = 0)
+
+		MIN_LATITUDE = -90.0 * D2R
+		MAX_LATITUDE = 90 * D2R
+		VALID_LATITUDE = MIN_LATITUDE...MAX_LATITUDE
+
+		def initialize(longitude, latitude, altitude = 0)
 			@latitude = latitude
 			@longitude = longitude
 			@altitude = altitude
 		end
 		
 		def valid?
-			VALID_LATITUDE.include? latitude and VALID_LONGITUDE.include? longitude
+			VALID_LONGITUDE.include?(longitude) and VALID_LATITUDE.include?(latitude)
 		end
 		
 		def to_s
-			"#<Location latitude=#{@latitude} longitude=#{@longitude.to_f} altitude=#{@altitude.to_f}>"
+			"#<Location longitude=#{@longitude.to_f} latitude=#{@latitude} altitude=#{@altitude.to_f}>"
 		end
 		
 		alias inspect to_s
 		
-		attr :latitude
-		attr :longitude
+		attr :longitude # -180 -> 180 (equivalent to x)
+		attr :latitude # -90 -> 90 (equivalent to y)
 		attr :altitude
 		
 		# http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
@@ -98,11 +98,11 @@ module Geospatial
 		
 		# Converts latitude, longitude to ECEF coordinate system
 		def to_ecef(alt)
-			clat = Math::cos(lat * D2R)
-			slat = Math::sin(lat * D2R)
 			clon = Math::cos(lon * D2R)
 			slon = Math::sin(lon * D2R)
-		
+			clat = Math::cos(lat * D2R)
+			slat = Math::sin(lat * D2R)
+
 			n = WGS84_A / Math::sqrt(1.0 - WGS84_E * WGS84_E * slat * slat)
 		
 			x = (n + alt) * clat * clon
@@ -135,10 +135,10 @@ module Geospatial
 		# calculate distance in metres between us and something else
 		# ref: http://codingandweb.blogspot.co.nz/2012/04/calculating-distance-between-two-points.html
 		def distance_from(other_position)
-			rlat1 = self.latitude * D2R 
 			rlong1 = self.longitude * D2R 
-			rlat2 = other_position.latitude * D2R 
+			rlat1 = self.latitude * D2R 
 			rlong2 = other_position.longitude * D2R 
+			rlat2 = other_position.latitude * D2R 
 			
 			dlon = rlong1 - rlong2
 			dlat = rlat1 - rlat2

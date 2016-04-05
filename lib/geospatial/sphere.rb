@@ -18,8 +18,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require 'matrix'
+
 module Geospatial
 	class Sphere
+		# Center must be a vector, radius must be a numeric value.
 		def initialize(center, radius)
 			@center = center
 			@radius = radius

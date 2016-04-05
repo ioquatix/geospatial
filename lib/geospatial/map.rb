@@ -1,15 +1,15 @@
-# Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
-# 
+# Copyright, 2016, by Samuel G. D. Williams. <http://www.codeotaku.com>
+#
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,15 +18,51 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'geospatial/location'
+require_relative 'location'
+require_relative 'aligned_box'
 
-module Geospatial::LocationSpec
-	describe Geospatial::Location do
-		it "compute the correct distance between two points" do
-			lake_tekapo = Geospatial::Location.new(-43.883, 170.516)
-			lake_alex = Geospatial::Location.new(-43.95, 170.45)
+module Geospatial
+	class Map
+		# Will use 60 bits to store hash:
+		ORDER = 30
+		
+		class Point
+			def initialize(location)
+				@location = location
+			end
 			
-			expect(lake_alex.distance_from(lake_tekapo)).to be_within(10).of(9_130)
+			attr :location
+			
+			def hash
+				@hash ||= Hilbert.hash(@location.latitude, @location.longitude, ORDER).freeze
+			end
+		end
+		
+		EARTH_BOUNDS = AlignedBox.new(Vector[-180, -90], Vector[180, 90]).freeze
+		
+		def initialize(bounds = EARTH_BOUNDS)
+			@bounds = bounds
+			
+			@points = []
+		end
+		
+		def << point
+			@points << point
+		end
+		
+		def sort!
+			@points.sort_by(&:hash)
+		end
+		
+		def query(bounding_box)
+			ranges = []
+			
+			Hilbert.traverse(ORDER, origin: @bounds.origin, size: @bounds.size) do |child_origin, child_size, prefix, order|
+				child = AlignedBox.new(child_origin, child_size)
+				
+				if bounding_box.overlaps(child)
+				end
+			end
 		end
 	end
 end

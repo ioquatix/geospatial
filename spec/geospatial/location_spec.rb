@@ -1,15 +1,15 @@
 # Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
-#
+# 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-#
+# 
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-#
+# 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,41 +18,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'matrix'
+require 'geospatial/location'
 
-module Geospatial
-	class AlignedBox
-		def initialize(origin, size)
-			@origin = origin
-			@size = size
-		end
-		
-		def dimensions
-			@origin.size
-		end
-		
-		def min
-			@origin
-		end
-		
-		def max
-			@origin + @size
-		end
-		
-		def contains_point(point)
-			point >= min and point < max
-		end
-		
-		def overlaps?(other, includes_edges)
-			contains_point()
+module Geospatial::LocationSpec
+	describe Geospatial::Location do
+		it "compute the correct distance between two points" do
+			lake_tekapo = Geospatial::Location.new(170.516, -43.883)
+			lake_alex = Geospatial::Location.new(170.45, -43.95)
 			
-			dimensions.times do |i|
-				if self.max[i] < other.min[i] or other.max[i] < self.min[i]
-					return false
-				end
-			end
-			
-			return true
+			expect(lake_alex.distance_from(lake_tekapo)).to be_within(10).of(9_130)
 		end
 	end
 end

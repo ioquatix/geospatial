@@ -1,4 +1,4 @@
-# Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2016, by Samuel G. D. Williams. <http://www.codeotaku.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,41 +18,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'matrix'
+require_relative 'location'
+
 
 module Geospatial
-	class AlignedBox
-		def initialize(origin, size)
-			@origin = origin
-			@size = size
+	class Map
+		EARTH_BOUNDS = AlignedBox.new(Vector[-180, -90], Vector[180, 90]).freeze
+		
+		def self.for_earth
+			self.new(EARTH_BOUNDS)
 		end
 		
-		def dimensions
-			@origin.size
+		def initialize(bounds)
+			@bounds = bounds
 		end
 		
-		def min
-			@origin
-		end
-		
-		def max
-			@origin + @size
-		end
-		
-		def contains_point(point)
-			point >= min and point < max
-		end
-		
-		def overlaps?(other, includes_edges)
-			contains_point()
+		def << object
 			
-			dimensions.times do |i|
-				if self.max[i] < other.min[i] or other.max[i] < self.min[i]
-					return false
-				end
-			end
-			
-			return true
 		end
 	end
 end
