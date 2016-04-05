@@ -25,7 +25,7 @@ module Geospatial::AlignedBoxSpec
 		let(:square) {Geospatial::AlignedBox.new(Vector[-1, -1], Vector[2, 2])}
 		
 		it "compute integral points" do
-			expect(square.integral_offset([-1, -1], [4, 4])).to be == [0, 0]
+			expect(square.integral_offset([-1, -1], 4)).to be == [0, 0]
 		end
 		
 		let(:new_zealand) {Geospatial::AlignedBox.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])}

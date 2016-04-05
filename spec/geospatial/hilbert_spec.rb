@@ -108,21 +108,21 @@ module Geospatial::HilbertSpec
 			expect(prefixes).to be_sorted
 		end
 		
-		it "should generate correct hash for order=0" do
-			expect(Geospatial::Hilbert.hash(3, 1, 0)).to be == 0b1100
-		end
-		
-		it "should generate correct hash for order=1" do
-			expect(Geospatial::Hilbert.hash(2, 0, 1)).to be == 0b1100
-		end
+		# it "should generate correct hash for order=0" do
+		# 	expect(Geospatial::Hilbert.hash(3, 1, 0)).to be == 0b1100
+		# end
+		# 
+		# it "should generate correct hash for order=1" do
+		# 	expect(Geospatial::Hilbert.hash(2, 0, 1)).to be == 0b1100
+		# end
 		
 		it "traverses and generates valid children" do
 			Geospatial::Hilbert.traverse(1, origin: [0, 0], size: [4, 4]).each do |origin, size, prefix, order|
-				hash = Geospatial::Hilbert.hash(origin[0].to_i, origin[1].to_i, 1)
-				
-				puts "Child origin=#{origin.inspect} prefix=#{prefix.to_s(2)} order=#{order} unhash=#{Geospatial::Hilbert.unhash(prefix)}"
-				
-				expect(prefix).to be == hash
+				if order == 0
+					hash = Geospatial::Hilbert.hash(origin[0].to_i, origin[1].to_i, 1) 
+					puts "Child origin=#{origin.inspect} prefix=#{prefix.to_s(2)} order=#{order} unhash=#{Geospatial::Hilbert.unhash(prefix)}"
+					expect(prefix).to be == hash
+				end
 			end
 		end
 	end
