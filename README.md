@@ -47,10 +47,6 @@ The simplest way to use this library is to use the built in `Map`:
 
 At a lower level you can use the method in the `Geospatial::Hilbert` module to `hash`, `unhash` and `traverse` the Hilbert mapping.
 
-## Further Reading
-
-- http://blog.notdot.net/2009/11/Damn-Cool-Algorithms-Spatial-indexing-with-Quadtrees-and-Hilbert-Curves
-
 ## Contributing
 
 1. Fork it
