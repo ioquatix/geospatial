@@ -48,6 +48,13 @@ module Geospatial::HilbertSpec
 			expect(Geospatial::Hilbert.hash(0, 1, 0)).to be == 3
 		end
 		
+		it "computes the correct unhash" do
+			expect(Geospatial::Hilbert.unhash(0)).to be == [0, 0]
+			expect(Geospatial::Hilbert.unhash(1)).to be == [1, 0]
+			expect(Geospatial::Hilbert.unhash(2)).to be == [1, 1]
+			expect(Geospatial::Hilbert.unhash(3)).to be == [0, 1]
+		end
+		
 		it "computes the correct hash of order=1" do
 			expect(Geospatial::Hilbert.hash(0, 0, 1)).to be == 0
 			expect(Geospatial::Hilbert.hash(1, 0, 1)).to be == 1
@@ -116,11 +123,16 @@ module Geospatial::HilbertSpec
 		# 	expect(Geospatial::Hilbert.hash(2, 0, 1)).to be == 0b1100
 		# end
 		
-		it "traverses and generates valid children" do
-			Geospatial::Hilbert.traverse(1, origin: [0, 0], size: [4, 4]).each do |origin, size, prefix, order|
-				if order == 0
-					hash = Geospatial::Hilbert.hash(origin[0].to_i, origin[1].to_i, 1) 
-					puts "Child origin=#{origin.inspect} prefix=#{prefix.to_s(2)} order=#{order} unhash=#{Geospatial::Hilbert.unhash(prefix)}"
+		it "traverses and generates valid matching hashes" do
+			order = 4
+			divisions = 2**(order+1)
+			
+			# puts "order=#{order} divisions=#{divisions}"
+			
+			Geospatial::Hilbert.traverse(order, origin: [0, 0], size: [divisions, divisions]).each do |origin, size, prefix, depth|
+				if depth == 0
+					hash = Geospatial::Hilbert.hash(origin[0].to_i, origin[1].to_i, order) 
+					# puts "Child origin=#{origin.inspect} prefix=#{prefix.to_s(2)} order=#{order} unhash=#{Geospatial::Hilbert.unhash(prefix)}"
 					expect(prefix).to be == hash
 				end
 			end

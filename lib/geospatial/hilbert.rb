@@ -20,6 +20,14 @@
 
 module Geospatial
 	module Hilbert
+		# Order is the index of the 2-bit pair which indexes into the 2x2 quadrants.
+		# Order | Size
+		# 0     | 2x2
+		# 1     | 4x4
+		# 2     | 8x8
+		# 3     | 16x16
+		# 4     | 32x32
+		
 		# Quadrants are numbered 0 to 3, and are in the following order:
 		# y
 		# 1 | 3 | 2 |
@@ -212,7 +220,7 @@ module Geospatial
 				
 				# Compute the bounds for the given quadrant:
 				child_origin, child_size = self.bounds_for(quadrant, origin, size)
-				
+				puts "child_size=#{child_size} order=#{order}"
 				# These both do the same thing, not sure which one is faster:
 				child_value = (value << 2) | prefix
 				

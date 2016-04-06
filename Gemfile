@@ -6,4 +6,6 @@ gemspec
 group :test do
 	gem 'simplecov'
 	gem 'coveralls', require: false
+	
+	gem "prawn"
 end
