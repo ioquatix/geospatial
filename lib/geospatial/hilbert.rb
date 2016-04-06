@@ -220,7 +220,7 @@ module Geospatial
 				
 				# Compute the bounds for the given quadrant:
 				child_origin, child_size = self.bounds_for(quadrant, origin, size)
-				puts "child_size=#{child_size} order=#{order}"
+				
 				# These both do the same thing, not sure which one is faster:
 				child_value = (value << 2) | prefix
 				

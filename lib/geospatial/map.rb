@@ -25,8 +25,8 @@ require_relative 'hilbert'
 
 module Geospatial
 	class Map
-		# The order is the number of times to divide along each axis, i.e. 2**order discrete segments. Each division requires 2 bits, one for each longitude/latitude.
-		DEFAULT_ORDER = 4
+		# The order is the number of times to divide along each axis, i.e. 2**(order+1) discrete segments. Each division requires 2 bits, one for each longitude/latitude. Order 0 gives 4 segments in total.
+		DEFAULT_ORDER = 8
 		
 		class Point
 			def initialize(map, location)
@@ -47,7 +47,7 @@ module Geospatial
 			raise ArgumentError("Order #{order} must be positive integer!") unless order >= 1
 			
 			@order = order
-			@scale = 2**order
+			@scale = 2**(order+1)
 			
 			@bounds = bounds
 			
@@ -60,8 +60,6 @@ module Geospatial
 		
 		def location_hash(location)
 			coordinates = @bounds.integral_offset(location.to_a, @scale)
-			
-			puts "Integral offset = #{coordinates} (#{@scale})"
 			
 			return Hilbert.hash(*coordinates, @order)
 		end
@@ -83,14 +81,10 @@ module Geospatial
 		def query(region)
 			prefixes = prefixes_for(region)
 			
-			return prefixes.filter(@points)
+			return prefixes.filter(@points).map(&:location)
 		end
 		
-		def prefixes_for(region)
-			prefixes = PrefixSet.new
-			
-			# puts "Searching for #{region.inspect} in origin=#{@bounds.origin} size=#{@bounds.size}..."
-			
+		def traverse(region)
 			Hilbert.traverse(@order, origin: @bounds.origin, size: @bounds.size) do |child_origin, child_size, prefix, order|
 				child = AlignedBox.new(Vector[*child_origin], Vector[*child_size])
 				
@@ -98,11 +92,11 @@ module Geospatial
 				
 				if region.intersects?(child)
 					if order == 0 # at bottom
-						puts "at bottom -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
-						prefixes.add(prefix, order); :skip
+						# puts "at bottom -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
+						yield(child, prefix, order); :skip
 					elsif region.contains?(child)
-						puts "contains child -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
-						prefixes.add(prefix, order); :skip
+						#puts "contains child -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
+						yield(child, prefix, order); :skip
 					else
 						#puts "going deeper..."
 					end
@@ -110,6 +104,14 @@ module Geospatial
 					#puts "out of bounds."
 					:skip
 				end
+			end
+		end
+		
+		def prefixes_for(region)
+			prefixes = PrefixSet.new
+			
+			traverse(region) do |child, prefix, order|
+				prefixes.add(prefix, order)
 			end
 			
 			return prefixes

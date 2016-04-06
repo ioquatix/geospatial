@@ -69,10 +69,8 @@ module Geospatial
 		end
 		
 		def filter(objects)
-			puts @ranges.inspect
-			
 			# This is a poor implementation.
-			objects.select{|object| puts object.hash.to_s(2); @ranges.any?{|range| range.include?(object.hash)}}
+			objects.select{|object| @ranges.any?{|range| range.include?(object.hash)}}
 		end
 	end
 end

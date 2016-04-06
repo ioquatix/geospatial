@@ -23,12 +23,19 @@ require 'matrix'
 module Geospatial
 	class AlignedBox
 		def self.from_bounds(min, max)
-			self.new(min, max-min)
+			self.new(min, max-min, max)
 		end
 		
-		def initialize(origin, size)
+		def initialize(origin, size, max = nil)
 			@origin = origin
 			@size = size
+			@max = max
+		end
+		
+		def freeze
+			self.max
+			
+			super
 		end
 		
 		def dimensions
@@ -74,10 +81,7 @@ module Geospatial
 		end
 		
 		def integral_offset(coordinate, scale)
-			puts "coordinate=#{coordinate} scale=#{scale} origin=#{@origin} size=#{@size}"
-			
 			dimensions.times.collect do |i|
-				puts "\t#{(coordinate[i] - @origin[i]).to_f / @size[i]}"
 				Integer((coordinate[i] - @origin[i]).to_f / @size[i] * scale)
 			end
 		end

@@ -41,16 +41,28 @@ module Geospatial::MapSpec
 				margin: 20,
 			)
 			
+			pdf.line_width 0.1
+			
+			world_path = File.expand_path("world.png", __dir__)
+			pdf.image world_path, :at => [0, 180], width: 360, height: 180
+			
 			pdf.stroke_axis(step_length: 45)
-			pdf.fill_color "00ff00"
 			
-			map.points.each do |point|
-				center =  [origin[0] + point.location.longitude, origin[1] + point.location.latitude]
-				puts "Adding point at #{center}"
-				pdf.circle center, 0.5
+			pdf.transparent(0.3, 0.9) do
+				pdf.stroke_color "ccccff"
+				pdf.fill_color "00abcc"
+				
+				yield pdf, Vector[*origin]
+			
+				pdf.fill_color "00ff00"
+				
+				map.points.each do |point|
+					center =  [origin[0] + point.location.longitude, origin[1] + point.location.latitude]
+					pdf.circle center, 0.1
+				end
+				
+				pdf.fill
 			end
-			
-			pdf.fill
 			
 			pdf.render_file "map.pdf"
 		end
@@ -61,7 +73,21 @@ module Geospatial::MapSpec
 			
 			subject.sort!
 			
-			visualise(subject)
+			visualise(subject) do |pdf, origin|
+				size = new_zealand.size
+				top_left = (origin + new_zealand.min) + Vector[0, size[1]]
+				pdf.rectangle(top_left.to_a, *size.to_a)
+				
+				pdf.fill
+				
+				subject.traverse(new_zealand) do |child, prefix, order|
+					size = child.size
+					top_left = (origin + child.min) + Vector[0, size[1]]
+					pdf.rectangle(top_left.to_a, *size.to_a)
+				end
+				
+				pdf.fill_and_stroke
+			end
 			
 			expect(subject.count).to be == 2
 			expect(subject.points[0].hash).to be <= subject.points[1].hash
@@ -74,7 +100,7 @@ module Geospatial::MapSpec
 			
 			points = subject.query(new_zealand)
 			expect(points).to include(lake_tekapo, lake_alex)
-			expect(points).to_not include(syndney)
+			expect(points).to_not include(sydney)
 		end
 	end
 end
