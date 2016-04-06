@@ -4,8 +4,8 @@
 
 Geospatial provides abstractions for dealing with geographical locations efficiently. It is not a generic point/line/polygon handling library like [RGeo](https://github.com/rgeo/rgeo), but a specially crafted library to deal with querying for points on a map efficiently.
 
-[![Build Status](https://secure.travis-ci.org/ioquatix/geospatial.png)](http://travis-ci.org/ioquatix/geospatial)
-[![Code Climate](https://codeclimate.com/github/ioquatix/geospatial.png)](https://codeclimate.com/github/ioquatix/geospatial)
+[![Build Status](https://secure.travis-ci.org/ioquatix/geospatial.svg)](http://travis-ci.org/ioquatix/geospatial)
+[![Code Climate](https://codeclimate.com/github/ioquatix/geospatial.svg)](https://codeclimate.com/github/ioquatix/geospatial)
 [![Coverage Status](https://coveralls.io/repos/ioquatix/geospatial/badge.svg)](https://coveralls.io/r/ioquatix/geospatial)
 
 ## Motivation
