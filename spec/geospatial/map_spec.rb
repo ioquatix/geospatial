@@ -49,7 +49,7 @@ module Geospatial::MapSpec
 			pdf.stroke_axis(step_length: 45)
 			
 			pdf.transparent(0.3, 0.9) do
-				pdf.stroke_color "ccccff"
+				pdf.stroke_color "000000"
 				pdf.fill_color "00abcc"
 				
 				yield pdf, Vector[*origin]
@@ -67,20 +67,15 @@ module Geospatial::MapSpec
 			pdf.render_file "map.pdf"
 		end
 		
-		it "should add points" do
-			subject << lake_tekapo
-			subject << lake_alex
-			
-			subject.sort!
-			
+		it "can generate visualisation" do
 			visualise(subject) do |pdf, origin|
-				size = new_zealand.size
-				top_left = (origin + new_zealand.min) + Vector[0, size[1]]
+				size = australia.size
+				top_left = (origin + australia.min) + Vector[0, size[1]]
 				pdf.rectangle(top_left.to_a, *size.to_a)
 				
 				pdf.fill
 				
-				subject.traverse(new_zealand) do |child, prefix, order|
+				subject.traverse(australia) do |child, prefix, order|
 					size = child.size
 					top_left = (origin + child.min) + Vector[0, size[1]]
 					pdf.rectangle(top_left.to_a, *size.to_a)
@@ -88,6 +83,13 @@ module Geospatial::MapSpec
 				
 				pdf.fill_and_stroke
 			end
+		end
+		
+		it "should add points" do
+			subject << lake_tekapo
+			subject << lake_alex
+			
+			subject.sort!
 			
 			expect(subject.count).to be == 2
 			expect(subject.points[0].hash).to be <= subject.points[1].hash

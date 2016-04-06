@@ -1,28 +1,51 @@
 # Geospatial
 
-Geospatial provides abstractions for dealing with geographical locations efficiently.
+![Australia Hilbert Curve](australia.png?raw=true "Australia Hilbert Curve Visualisation")
+
+Geospatial provides abstractions for dealing with geographical locations efficiently. It is not a generic point/line/polygon handling library like [RGeo](https://github.com/rgeo/rgeo), but a specially crafted library to deal with querying for points on a map efficiently.
 
 [![Build Status](https://secure.travis-ci.org/ioquatix/geospatial.png)](http://travis-ci.org/ioquatix/geospatial)
 [![Code Climate](https://codeclimate.com/github/ioquatix/geospatial.png)](https://codeclimate.com/github/ioquatix/geospatial)
 [![Coverage Status](https://coveralls.io/repos/ioquatix/geospatial/badge.svg)](https://coveralls.io/r/ioquatix/geospatial)
 
+## Motivation
+
+We had a need to query a database of places efficiently using SQLite. We did some investigation and found that SQLite (at least at the time) couldn't use composite indexes efficiently. Our testing revealed that MySQL also didn't really do well with large amounts of data. We had a table with 5Gb of data, and 15Gb of indexes. Crazy.
+
+After researching geospatial hashing algorithms, I found [this blog post](http://blog.notdot.net/2009/11/Damn-Cool-Algorithms-Spatial-indexing-with-Quadtrees-and-Hilbert-Curves) and decided to implement a geospatial hash using the Hilbert curve. This library exposes a fast indexing and querying mechanism based on Hilbert curves, for points on a map, which can be integrated into a database or other systems as required.
+
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'geospatial'
+	gem 'geospatial'
 
 And then execute:
 
-    $ bundle
+	$ bundle
 
 Or install it yourself as:
 
-    $ gem install geospatial
+	$ gem install geospatial
 
 ## Usage
 
-...
+The simplest way to use this library is to use the built in `Map`:
+
+	map = Geospatial::Map.new
+	map << Geospatial::Location.new(170.53, -43.89) # Lake Tekapo, New Zealand.
+	map << Geospatial::Location.new(170.45, -43.94) # Lake Alex, New Zealand.
+	map << Geospatial::Location.new(151.21, -33.85) # Sydney, Australia.
+
+	map.sort!
+
+	new_zealand = Geospatial::AlignedBox.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])
+
+	points = subject.query(new_zealand)
+	expect(points).to include(lake_tekapo, lake_alex)
+	expect(points).to_not include(sydney)
+
+At a lower level you can use the method in the `Geospatial::Hilbert` module to `hash`, `unhash` and `traverse` the Hilbert mapping.
 
 ## Further Reading
 
