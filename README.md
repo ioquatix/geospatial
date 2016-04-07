@@ -39,7 +39,7 @@ The simplest way to use this library is to use the built in `Map`:
 
 	map.sort!
 
-	new_zealand = Geospatial::AlignedBox.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])
+	new_zealand = Geospatial::Box.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])
 
 	points = subject.query(new_zealand)
 	expect(points).to include(lake_tekapo, lake_alex)

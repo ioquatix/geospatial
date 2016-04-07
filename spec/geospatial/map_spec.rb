@@ -27,8 +27,8 @@ module Geospatial::MapSpec
 		let(:lake_alex) {Geospatial::Location.new(170.45, -43.94)}
 		let(:sydney) {Geospatial::Location.new(151.21, -33.85)}
 		
-		let(:new_zealand) {Geospatial::AlignedBox.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])}
-		let(:australia) {Geospatial::AlignedBox.from_bounds(Vector[112.0, -45.0], Vector[155.0, -10.0])}
+		let(:new_zealand) {Geospatial::Box.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])}
+		let(:australia) {Geospatial::Box.from_bounds(Vector[112.0, -45.0], Vector[155.0, -10.0])}
 		
 		def visualise(map)
 			margin = 10

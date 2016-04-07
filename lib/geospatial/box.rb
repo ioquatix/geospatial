@@ -21,7 +21,7 @@
 require 'matrix'
 
 module Geospatial
-	class AlignedBox
+	class Box
 		def self.from_bounds(min, max)
 			self.new(min, max-min, max)
 		end

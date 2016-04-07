@@ -19,8 +19,8 @@
 # THE SOFTWARE.
 
 require_relative 'location'
-require_relative 'aligned_box'
-require_relative 'prefix_set'
+require_relative 'box'
+require_relative 'filter'
 require_relative 'hilbert'
 
 module Geospatial
@@ -41,7 +41,7 @@ module Geospatial
 			end
 		end
 		
-		EARTH_BOUNDS = AlignedBox.new(Vector[-180, -90], Vector[360, 180]).freeze
+		EARTH_BOUNDS = Box.new(Vector[-180, -90], Vector[360, 180]).freeze
 		
 		def initialize(bounds = EARTH_BOUNDS, order: DEFAULT_ORDER)
 			raise ArgumentError("Order #{order} must be positive integer!") unless order >= 1
@@ -79,14 +79,14 @@ module Geospatial
 		end
 		
 		def query(region)
-			prefixes = prefixes_for(region)
+			filter = filter_for(region)
 			
-			return prefixes.filter(@points).map(&:location)
+			return filter.apply(@points).map(&:location)
 		end
 		
 		def traverse(region)
 			Hilbert.traverse(@order, origin: @bounds.origin, size: @bounds.size) do |child_origin, child_size, prefix, order|
-				child = AlignedBox.new(Vector[*child_origin], Vector[*child_size])
+				child = Box.new(Vector[*child_origin], Vector[*child_size])
 				
 				# puts "Considering (order=#{order}) #{child.inspect}..."
 				
@@ -107,14 +107,14 @@ module Geospatial
 			end
 		end
 		
-		def prefixes_for(region)
-			prefixes = PrefixSet.new
+		def filter_for(region)
+			filter = Filter.new
 			
 			traverse(region) do |child, prefix, order|
-				prefixes.add(prefix, order)
+				filter.add(prefix, order)
 			end
 			
-			return prefixes
+			return filter
 		end
 	end
 end

@@ -19,39 +19,39 @@
 # THE SOFTWARE.
 
 module Geospatial
-	class PrefixRange
-		def initialize(prefix, order)
-			@min = prefix
-			update_max(prefix, order)
-		end
-		
-		attr :min
-		attr :max
-		
-		def inspect
-			"#{min.to_s(2)}..#{max.to_s(2)}"
-		end
-		
-		# Returns the new max if expansion was possible, or nil otherwise.
-		def expand!(prefix, order)
-			if @max < prefix and prefix == @max+1
+	class Filter
+		class Range
+			def initialize(prefix, order)
+				@min = prefix
 				update_max(prefix, order)
+			end
+			
+			attr :min
+			attr :max
+			
+			def inspect
+				"#{min.to_s(2)}..#{max.to_s(2)}"
+			end
+			
+			# Returns the new max if expansion was possible, or nil otherwise.
+			def expand!(prefix, order)
+				if @max < prefix and prefix == @max+1
+					update_max(prefix, order)
+				end
+			end
+			
+			def include?(hash)
+				hash >= min and hash <= max
+			end
+			
+			private
+			
+			def update_max(prefix, order)
+				# We set the RHS of the prefix to 1s, which is the maximum:
+				@max = prefix | ((1 << (order*2)) - 1)
 			end
 		end
 		
-		def include?(hash)
-			hash >= min and hash <= max
-		end
-		
-		private
-		
-		def update_max(prefix, order)
-			# We set the RHS of the prefix to 1s, which is the maximum:
-			@max = prefix | ((1 << (order*2)) - 1)
-		end
-	end
-	
-	class PrefixSet
 		def initialize
 			@ranges = []
 		end
@@ -64,11 +64,11 @@ module Geospatial
 			end
 			
 			unless last = @ranges.last and last.expand!(prefix, order)
-				@ranges << PrefixRange.new(prefix, order)
+				@ranges << Range.new(prefix, order)
 			end
 		end
 		
-		def filter(objects)
+		def apply(objects)
 			# This is a poor implementation.
 			objects.select{|object| @ranges.any?{|range| range.include?(object.hash)}}
 		end

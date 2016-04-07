@@ -21,7 +21,7 @@
 require 'matrix'
 
 module Geospatial
-	class Sphere
+	class Circle
 		# Center must be a vector, radius must be a numeric value.
 		def initialize(center, radius)
 			@center = center
@@ -30,6 +30,41 @@ module Geospatial
 		
 		attr :center
 		attr :radius
+		
+		def inspect
+			"#{self.class}(#{@center} -> #{@radius})"
+		end
+		
+		def contains_point?(point)
+			
+			
+			dimensions.times do |i|
+				return false if point[i] < min[i] or point[i] >= max[i]
+			end
+			
+			return true
+		end
+		
+		def contains?(other)
+			contains_point?(other.min) && contains_point?(other.max)
+		end
+		
+		def intersects?(other)
+			dimensions.times do |i|
+				# Separating axis theorm, if the minimum of the other is past the maximum of self, or the maximum of other is less than the minimum of self, an intersection cannot occur.
+				if other.min[i] > self.max[i] or other.max[i] < self.min[i]
+					return false
+				end
+			end
+			
+			return true
+		end
+		
+		def integral_offset(coordinate, scale)
+			dimensions.times.collect do |i|
+				Integer((coordinate[i] - @origin[i]).to_f / @size[i] * scale)
+			end
+		end
 		
 		def intersects(other)
 			case other

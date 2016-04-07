@@ -43,10 +43,9 @@ module Geospatial
 		MAX_LATITUDE = 90 * D2R
 		VALID_LATITUDE = MIN_LATITUDE...MAX_LATITUDE
 
-		def initialize(longitude, latitude, altitude = 0)
+		def initialize(longitude, latitude)
 			@latitude = latitude
 			@longitude = longitude
-			@altitude = altitude
 		end
 		
 		def valid?
@@ -54,25 +53,24 @@ module Geospatial
 		end
 		
 		def to_a
-			[@longitude, @latitude, @altitude]
+			[@longitude, @latitude]
 		end
 		
 		def to_s
-			"#<Location longitude=#{@longitude.to_f} latitude=#{@latitude} altitude=#{@altitude.to_f}>"
+			"#<Location longitude=#{@longitude.to_f} latitude=#{@latitude}>"
 		end
 		
 		alias inspect to_s
 		
 		attr :longitude # -180 -> 180 (equivalent to x)
 		attr :latitude # -90 -> 90 (equivalent to y)
-		attr :altitude
 		
 		# http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
 		def bounding_box(distance, radius = EARTH_RADIUS)
 			raise ArgumentError.new("Invalid distance or radius") if distance < 0 or radius < 0
 
 			# angular distance in radians on a great circle
-			angular_distance = distance / (radius + self.altitude)
+			angular_distance = distance / radius
 
 			min_latitude = (self.latitude * D2R) - angular_distance
 			max_latitude = (self.latitude * D2R) + angular_distance
@@ -101,7 +99,7 @@ module Geospatial
 		end
 		
 		# Converts latitude, longitude to ECEF coordinate system
-		def to_ecef(alt)
+		def to_ecef
 			clon = Math::cos(lon * D2R)
 			slon = Math::sin(lon * D2R)
 			clat = Math::cos(lat * D2R)
@@ -109,9 +107,9 @@ module Geospatial
 
 			n = WGS84_A / Math::sqrt(1.0 - WGS84_E * WGS84_E * slat * slat)
 		
-			x = (n + alt) * clat * clon
-			y = (n + alt) * clat * slon
-			z = (n * (1.0 - WGS84_E * WGS84_E) + alt) * slat
+			x = n * clat * clon
+			y = n * clat * slon
+			z = n * (1.0 - WGS84_E * WGS84_E) * slat
 	
 			return x, y, z
 		end
@@ -131,9 +129,9 @@ module Geospatial
 			lat = Math::atan2((z+ep*ep*b*(Math::sin(th) ** 3)), (p-e*e*a*(Math::cos(th)**3)))
 			
 			n = a / Math::sqrt(1.0-e*e*(Math::sin(lat) ** 2))
-			alt = p / Math::cos(lat)-n
+			# alt = p / Math::cos(lat)-n
 	
-			return self.new(lat*R2D, lon*R2D, alt)
+			return self.new(lat*R2D, lon*R2D)
 		end
 		
 		# calculate distance in metres between us and something else
@@ -152,6 +150,10 @@ module Geospatial
 			d = EARTH_RADIUS * c
 			
 			return d
+		end
+		
+		def - other
+			
 		end
 	end
 end

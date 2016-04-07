@@ -20,16 +20,16 @@
 
 require 'geospatial/map'
 
-module Geospatial::AlignedBoxSpec
-	describe Geospatial::AlignedBox do
-		let(:square) {Geospatial::AlignedBox.new(Vector[-1, -1], Vector[2, 2])}
+module Geospatial::BoxSpec
+	describe Geospatial::Box do
+		let(:square) {Geospatial::Box.new(Vector[-1, -1], Vector[2, 2])}
 		
 		it "compute integral points" do
 			expect(square.integral_offset([-1, -1], 4)).to be == [0, 0]
 		end
 		
-		let(:new_zealand) {Geospatial::AlignedBox.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])}
-		let(:child) {Geospatial::AlignedBox.new(Vector[135.0, -67.5], Vector[45.0, 22.5])}
+		let(:new_zealand) {Geospatial::Box.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])}
+		let(:child) {Geospatial::Box.new(Vector[135.0, -67.5], Vector[45.0, 22.5])}
 		
 		it "should intersect" do
 			expect(new_zealand).to be_intersect(child)
