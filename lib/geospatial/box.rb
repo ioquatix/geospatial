@@ -38,10 +38,6 @@ module Geospatial
 			super
 		end
 		
-		def dimensions
-			@origin.size
-		end
-		
 		attr :origin
 		attr :size
 		
@@ -57,20 +53,40 @@ module Geospatial
 			@max ||= @origin + @size
 		end
 		
-		def contains_point?(point)
-			dimensions.times do |i|
+		# This yields the four corners of the box.
+		def corners
+			yield(@origin)
+			
+			max = self.max
+			yield(Vector[max[0], @origin[1]])
+			yield(max)
+			yield(Vector[@origin[0], max[1]])
+		end
+		
+		# This yields the midpoints of the four sides of the box.
+		def midpoints
+			size = self.size
+			
+			yield(Vector[@origin[0] + size[0] / 2, @origin[1]])
+			yield(Vector[@origin[0] + size[0], @origin[1] + size[1] / 2])
+			yield(Vector[@origin[0] + size[0] / 2, @origin[1] + size[1]])
+			yield(Vector[@origin[0], @origin[1] + size[1] / 2])
+		end
+		
+		def include_point?(point)
+			2.times do |i|
 				return false if point[i] < min[i] or point[i] >= max[i]
 			end
 			
 			return true
 		end
 		
-		def contains?(other)
-			contains_point?(other.min) && contains_point?(other.max)
+		def include?(other)
+			include_point?(other.min) && include_point?(other.max)
 		end
 		
-		def intersects?(other)
-			dimensions.times do |i|
+		def intersect?(other)
+			2.times do |i|
 				# Separating axis theorm, if the minimum of the other is past the maximum of self, or the maximum of other is less than the minimum of self, an intersection cannot occur.
 				if other.min[i] > self.max[i] or other.max[i] < self.min[i]
 					return false
@@ -81,7 +97,7 @@ module Geospatial
 		end
 		
 		def integral_offset(coordinate, scale)
-			dimensions.times.collect do |i|
+			2.times.collect do |i|
 				Integer((coordinate[i] - @origin[i]).to_f / @size[i] * scale)
 			end
 		end

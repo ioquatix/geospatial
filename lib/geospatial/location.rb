@@ -75,21 +75,21 @@ module Geospatial
 			min_latitude = (self.latitude * D2R) - angular_distance
 			max_latitude = (self.latitude * D2R) + angular_distance
 
-			if min_latitude > MIN_LAT and max_latitude < MAX_LAT
+			if min_latitude > MIN_LATITUDE and max_latitude < MAX_LATITUDE
 				longitude_delta = Math::asin(Math::sin(angular_distance) / Math::cos(self.latitude * D2R))
 				
 				min_longitude = (self.longitude * D2R) - longitude_delta
-				min_longitude += 2.0 * Math::PI if (min_longitude < MIN_LON)
+				min_longitude += 2.0 * Math::PI if (min_longitude < MIN_LONGITUDE)
 				
 				max_longitude = (self.longitude * D2R) + longitude_delta;
-				max_longitude -= 2.0 * Math::PI if (max_longitude > MAX_LON)
+				max_longitude -= 2.0 * Math::PI if (max_longitude > MAX_LONGITUDE)
 			else
 				# a pole is within the distance
-				min_latitude = [min_latitude, MIN_LAT].max
-				max_latitude = [max_latitude, MAX_LAT].min
+				min_latitude = [min_latitude, MIN_LATITUDE].max
+				max_latitude = [max_latitude, MAX_LATITUDE].min
 				
-				min_longitude = MIN_LON
-				max_longitude = MAX_LON
+				min_longitude = MIN_LONGITUDE
+				max_longitude = MAX_LONGITUDE
 			end
 			
 			return {
@@ -150,10 +150,6 @@ module Geospatial
 			d = EARTH_RADIUS * c
 			
 			return d
-		end
-		
-		def - other
-			
 		end
 	end
 end

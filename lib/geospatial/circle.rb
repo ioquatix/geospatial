@@ -21,6 +21,7 @@
 require 'matrix'
 
 module Geospatial
+	# A circle is a geometric primative where the center is a location and the radius is in meters.
 	class Circle
 		# Center must be a vector, radius must be a numeric value.
 		def initialize(center, radius)
@@ -35,53 +36,70 @@ module Geospatial
 			"#{self.class}(#{@center} -> #{@radius})"
 		end
 		
-		def contains_point?(point)
-			
-			
-			dimensions.times do |i|
-				return false if point[i] < min[i] or point[i] >= max[i]
+		def distance_from(point)
+			Location.new(point[0], point[1]).distance_from(@center)
+		end
+		
+		def include_point?(point, radius = @radius)
+			distance_from(point) <= radius
+		end
+		
+		def include_box?(other)
+			# We must contain the for corners of the other box:
+			other.corners do |corner|
+				return false unless include_point?(corner)
 			end
 			
 			return true
 		end
 		
-		def contains?(other)
-			contains_point?(other.min) && contains_point?(other.max)
+		def include_circle?(other)
+			# We must be big enough to contain the other point:
+			@radius >= other.radius && include_point?(other.center.to_a, @radius - other.radius)
 		end
 		
-		def intersects?(other)
-			dimensions.times do |i|
-				# Separating axis theorm, if the minimum of the other is past the maximum of self, or the maximum of other is less than the minimum of self, an intersection cannot occur.
-				if other.min[i] > self.max[i] or other.max[i] < self.min[i]
-					return false
-				end
-			end
-			
-			return true
-		end
-		
-		def integral_offset(coordinate, scale)
-			dimensions.times.collect do |i|
-				Integer((coordinate[i] - @origin[i]).to_f / @size[i] * scale)
-			end
-		end
-		
-		def intersects(other)
+		def include?(other)
 			case other
-			when Sphere
-				intersects_with_sphere(other)
-			else
-				raise UnimplementedError.new("Can't compute intersection of #{self.class} and #{other.class}")
+			when Box
+				include_box?(other)
+			when Circle
+				include_circle?(other)
 			end
 		end
 		
-		# This function needs to handle distances in space which wraps. It currently doesn't do that.
-		def distance_from_sphere(other_sphere)
-			other_sphere.center.distance_from(@center)
+		def intersect?(other)
+			case other
+			when Box
+				intersect_with_box?(other)
+			when Circle
+				intersect_with_circle?(other)
+			end
 		end
 		
-		def intersects_with_sphere(other)
-			return distance_from_sphere(other) <= (other.radius + self.radius)
+		def midpoints
+			@bounds ||= @center.bounding_box(@radius)
+			
+			yield([@bounds[:longitude].begin, @center.latitude])
+			yield([@bounds[:longitude].end, @center.latitude])
+			yield([@center.longitude, @bounds[:latitude].begin])
+			yield([@center.longitude, @bounds[:latitude].end])
+		end
+		
+		def intersect_with_box?(other)
+			# If we contain any of the four corners:
+			other.corners do |corner|
+				return true if include_point?(corner)
+			end
+			
+			midpoints do |midpoint|
+				return true if other.include_point?(midpoint)
+			end
+			
+			return false
+		end
+		
+		def intersect_with_circle?(other)
+			include_point?(other.center.to_a, @radius + other.radius)
 		end
 	end
 end

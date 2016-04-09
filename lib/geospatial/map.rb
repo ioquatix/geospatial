@@ -26,7 +26,7 @@ require_relative 'hilbert'
 module Geospatial
 	class Map
 		# The order is the number of times to divide along each axis, i.e. 2**(order+1) discrete segments. Each division requires 2 bits, one for each longitude/latitude. Order 0 gives 4 segments in total.
-		DEFAULT_ORDER = 8
+		DEFAULT_ORDER = 10
 		
 		class Point
 			def initialize(map, location)
@@ -90,12 +90,12 @@ module Geospatial
 				
 				# puts "Considering (order=#{order}) #{child.inspect}..."
 				
-				if region.intersects?(child)
+				if region.intersect?(child)
 					if order == 0 # at bottom
 						# puts "at bottom -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
 						yield(child, prefix, order); :skip
-					elsif region.contains?(child)
-						#puts "contains child -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
+					elsif region.include?(child)
+						#puts "include child -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
 						yield(child, prefix, order); :skip
 					else
 						#puts "going deeper..."
