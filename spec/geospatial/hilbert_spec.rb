@@ -115,19 +115,13 @@ module Geospatial::HilbertSpec
 			expect(prefixes).to be_sorted
 		end
 		
-		# it "should generate correct hash for order=0" do
-		# 	expect(Geospatial::Hilbert.hash(3, 1, 0)).to be == 0b1100
-		# end
-		# 
-		# it "should generate correct hash for order=1" do
-		# 	expect(Geospatial::Hilbert.hash(2, 0, 1)).to be == 0b1100
-		# end
+		it "should generate same prefix" do
+			expect(Geospatial::Hilbert.hash(4, 4, 2)) == Geospatial::Hilbert.hash(2, 2, 1)
+		end
 		
 		it "traverses and generates valid matching hashes" do
 			order = 4
 			divisions = 2**(order+1)
-			
-			# puts "order=#{order} divisions=#{divisions}"
 			
 			Geospatial::Hilbert.traverse(order, origin: [0, 0], size: [divisions, divisions]).each do |origin, size, prefix, depth|
 				if depth == 0
