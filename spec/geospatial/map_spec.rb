@@ -75,7 +75,7 @@ module Geospatial::MapSpec
 				
 				pdf.fill
 				
-				subject.traverse(australia) do |child, prefix, order|
+				subject.traverse(australia, depth: subject.order - 10) do |child, prefix, order|
 					size = child.size
 					top_left = (origin + child.min) + Vector[0, size[1]]
 					pdf.rectangle(top_left.to_a, *size.to_a)
@@ -100,7 +100,7 @@ module Geospatial::MapSpec
 			
 			subject.sort!
 			
-			points = subject.query(new_zealand)
+			points = subject.query(new_zealand, depth: 10)
 			expect(points).to include(lake_tekapo, lake_alex)
 			expect(points).to_not include(sydney)
 		end

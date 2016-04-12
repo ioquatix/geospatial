@@ -97,13 +97,9 @@ module Geospatial::CircleSpec
 			
 			circle = Geospatial::Circle.new(lake_tekapo, 100_000)
 			
-			filter = map.filter_for(circle)
-			#puts filter.ranges.inspect
-			#puts filter.ranges.count
-			
 			visualise(map) do |pdf, origin|
 				#count = 0
-				map.traverse(circle) do |child, prefix, order|
+				map.traverse(circle, depth: map.order - 10) do |child, prefix, order|
 					#count += 1
 					size = child.size
 					top_left = (origin + child.min) + Vector[0, size[1]]

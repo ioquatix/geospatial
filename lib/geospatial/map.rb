@@ -26,7 +26,7 @@ require_relative 'hilbert'
 module Geospatial
 	class Map
 		# The order is the number of times to divide along each axis, i.e. 2**(order+1) discrete segments. Each division requires 2 bits, one for each longitude/latitude. Order 0 gives 4 segments in total.
-		DEFAULT_ORDER = 11
+		DEFAULT_ORDER = 20
 		
 		class Point
 			def initialize(map, location)
@@ -37,7 +37,7 @@ module Geospatial
 			attr :location
 			
 			def hash
-				@hash ||= @map.location_hash(@location).freeze
+				@hash ||= @map.hash_for_coordinates(@location.to_a).freeze
 			end
 		end
 		
@@ -58,14 +58,25 @@ module Geospatial
 		attr :bounds
 		attr :points
 		
-		def location_hash(location)
-			coordinates = @bounds.integral_offset(location.to_a, @scale)
+		def hash_for_coordinates(coordinates)
+			integral = @bounds.to_integral(coordinates, @scale)
 			
-			return Hilbert.hash(*coordinates, @order)
+			return Hilbert.hash(*integral, @order)
+		end
+		
+		def point_for_hash(hash)
+			integral = Hilbert.unhash(hash, @order)
+			coordinates = @bounds.from_integral(integral, @scale)
+			
+			return Point.new(self, Location.new(*coordinates))
+		end
+		
+		def point_for_location(location)
+			Point.new(self, location)
 		end
 		
 		def << location
-			@points << Point.new(self, location)
+			@points << point_for_location(location)
 			
 			return self
 		end
@@ -78,20 +89,20 @@ module Geospatial
 			@points.sort_by!(&:hash)
 		end
 		
-		def query(region)
-			filter = filter_for(region)
+		def query(region, **options)
+			filter = filter_for(region, **options)
 			
 			return filter.apply(@points).map(&:location)
 		end
 		
-		def traverse(region)
+		def traverse(region, depth: 0)
 			Hilbert.traverse(@order, origin: @bounds.origin, size: @bounds.size) do |child_origin, child_size, prefix, order|
 				child = Box.new(Vector[*child_origin], Vector[*child_size])
 				
 				# puts "Considering (order=#{order}) #{child.inspect}..."
 				
 				if region.intersect?(child)
-					if order == 0 # at bottom
+					if order == depth # at bottom
 						# puts "at bottom -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
 						yield(child, prefix, order); :skip
 					elsif region.include?(child)
@@ -107,10 +118,10 @@ module Geospatial
 			end
 		end
 		
-		def filter_for(region)
+		def filter_for(region, **options)
 			filter = Filter.new
 			
-			traverse(region) do |child, prefix, order|
+			traverse(region, **options) do |child, prefix, order|
 				filter.add(prefix, order)
 			end
 			

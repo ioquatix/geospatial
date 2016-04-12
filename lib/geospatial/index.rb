@@ -1,4 +1,4 @@
-# Copyright, 2015, by Samuel G. D. Williams. <http://www.codeotaku.com>
+# Copyright, 2016, by Samuel G. D. Williams. <http://www.codeotaku.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,6 +18,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require_relative 'map'
+
 module Geospatial
-	VERSION = "1.0.0"
+	class Index
+		class << self
+			def map
+				@map ||= Geospatial::Map.new
+			end
+			
+			def load(hash)
+				if hash
+					map.point_for_hash(hash)
+				end
+			end
+			
+			def dump(point)
+				point.hash
+			end
+		end
+	end
 end

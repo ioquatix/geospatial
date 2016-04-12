@@ -24,8 +24,12 @@ module Geospatial::BoxSpec
 	describe Geospatial::Box do
 		let(:square) {Geospatial::Box.new(Vector[-1, -1], Vector[2, 2])}
 		
-		it "compute integral points" do
-			expect(square.integral_offset([-1, -1], 4)).to be == [0, 0]
+		it "convert to integral" do
+			expect(square.to_integral([-1, -1], 4)).to be == [0, 0]
+		end
+		
+		it "convert from integral" do
+			expect(square.from_integral([0, 0], 4)).to be == [-1, -1]
 		end
 		
 		let(:new_zealand) {Geospatial::Box.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])}
