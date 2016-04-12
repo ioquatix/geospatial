@@ -41,7 +41,7 @@ module Geospatial::MapSpec
 				margin: 20,
 			)
 			
-			pdf.line_width 0.1
+			pdf.line_width 0.05
 			
 			world_path = File.expand_path("world.png", __dir__)
 			pdf.image world_path, :at => [0, 180], width: 360, height: 180

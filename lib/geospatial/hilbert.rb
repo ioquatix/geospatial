@@ -108,10 +108,8 @@ module Geospatial
 		end
 		
 		# x and y must be integers, between 0..(2**order-1)
-		def self.hash(x, y, order)
+		def self.hash(x, y, order, rotation = A)
 			value = 0
-			# The initial rotation depends on the order:
-			rotation = order.even? ? A : B
 			
 			order.downto(0) do |i|
 				# This computes the normalized quadrant for the ith bit of x, y:
@@ -148,21 +146,9 @@ module Geospatial
 			return x, y
 		end
 		
-		# Gives the order of the hilbert curve, where order 0 is defined as a single iteration of the curve.
-		def self.order_of(value)
-			(value.bit_length + 1) / 2 - 1
-		end
-		
-		def self.unhash(value)
+		def self.unhash(value, order, rotation = A)
 			x = 0
 			y = 0
-			
-			rotation = A
-			
-			order = self.order_of(value)
-			
-			# The initial rotation depends on the order:
-			rotation = order.even? ? A : B
 			
 			order.downto(0) do |i|
 				# Extract the 2-bit prefix:
@@ -200,9 +186,7 @@ module Geospatial
 		end
 		
 		# Enumerate a depth first traversal of the hilbert curve from the top of the tree down.
-		def self.traverse(order, origin: [0, 0], size: [1, 1], &block)
-			# The initial rotation depends on the order:
-			rotation = order.even? ? A : B
+		def self.traverse(order, rotation = A, origin: [0, 0], size: [1, 1], &block)
 			value = 0
 			
 			if block_given?
