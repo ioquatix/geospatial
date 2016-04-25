@@ -24,13 +24,13 @@ module Geospatial::BoxSpec
 	describe Geospatial::Box do
 		let(:square) {Geospatial::Box.new(Vector[-1, -1], Vector[2, 2])}
 		
-		it "convert to integral" do
-			expect(square.to_integral([-1, -1], 4)).to be == [0, 0]
-		end
-		
-		it "convert from integral" do
-			expect(square.from_integral([0, 0], 4)).to be == [-1, -1]
-		end
+		# it "convert to integral" do
+		# 	expect(square.to_integral([-1, -1], 4)).to be == [0, 0]
+		# end
+		# 
+		# it "convert from integral" do
+		# 	expect(square.from_integral([0, 0], 4)).to be == [-1, -1]
+		# end
 		
 		let(:new_zealand) {Geospatial::Box.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])}
 		let(:child) {Geospatial::Box.new(Vector[135.0, -67.5], Vector[45.0, 22.5])}

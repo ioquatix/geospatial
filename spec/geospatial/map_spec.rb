@@ -18,11 +18,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require 'geospatial/hilbert'
 require 'geospatial/map'
 require 'prawn'
 
 module Geospatial::MapSpec
-	describe Geospatial::Map do
+	HILBERT_EARTH = Geospatial::Hilbert.new([Geospatial::LONGITUDE, Geospatial::LATITUDE])
+	
+	describe Geospatial::Map.new(HILBERT_EARTH) do
 		let(:lake_tekapo) {Geospatial::Location.new(170.53, -43.89)}
 		let(:lake_alex) {Geospatial::Location.new(170.45, -43.94)}
 		let(:sydney) {Geospatial::Location.new(151.21, -33.85)}

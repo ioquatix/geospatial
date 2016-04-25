@@ -24,17 +24,21 @@ module Geospatial
 	class Index
 		class << self
 			def map
-				@map ||= Geospatial::Map.new
+				@map ||= Geospatial::Map.for_earth
 			end
 			
 			def load(hash)
 				if hash
 					map.point_for_hash(hash)
+				else
+					
 				end
 			end
 			
 			def dump(point)
-				point.hash
+				if point and !point.nil?
+					point.hash
+				end
 			end
 		end
 	end

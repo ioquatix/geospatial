@@ -24,59 +24,79 @@ require_relative 'filter'
 require_relative 'hilbert'
 
 module Geospatial
-	class Map
-		# The order is the number of times to divide along each axis, i.e. 2**(order+1) discrete segments. Each division requires 2 bits, one for each longitude/latitude. Order 0 gives 4 segments in total.
-		DEFAULT_ORDER = 20
-		
-		class Point
-			def initialize(map, location)
-				@map = map
-				@location = location
-			end
-			
-			attr :location
-			
-			def hash
-				@hash ||= @map.hash_for_coordinates(@location.to_a).freeze
-			end
+	# A point is a location on a map with a specific hash representation based on the map. A point might store multi-dimenstional data (e.g. longitude, latitude, time) which is hashed to a single column.
+	class Point
+		def initialize(map, coordinates, object = nil)
+			@map = map
+			@coordinates = coordinates
+			@object = object
 		end
 		
-		EARTH_BOUNDS = Box.new(Vector[-180, -90], Vector[360, 180]).freeze
+		attr :object
 		
-		def initialize(bounds = EARTH_BOUNDS, order: DEFAULT_ORDER)
-			raise ArgumentError("Order #{order} must be positive integer!") unless order >= 1
-			
-			@order = order
-			@scale = 2**(order+1)
-			
-			@bounds = bounds
+		def [] index
+			@coordinates[index]
+		end
+		
+		def []= index, value
+			@coordinates[index] = value
+		end
+		
+		attr :coordinates
+		
+		def eql?(other)
+			self.class.eql?(other.class) and @coordinates.eql?(other.coordinates)
+		end
+		
+		def hash
+			@hash ||= @map.hash_for_coordinates(@coordinates).freeze
+		end
+	end
+	
+	class Map
+		def self.for_earth
+			self.new(Hilbert.new([LONGITUDE, LATITUDE]))
+		end
+		
+		def initialize(function)
+			@function = function
 			
 			@points = []
+			
+			@bounds = nil
 		end
 		
-		attr :order
-		attr :bounds
+		def order
+			@function.order
+		end
+		
+		def bounds
+			unless @bounds
+				origin = @function.dimensions.collect(&:origin)
+				size = @function.dimensions.collect(&:size)
+				
+				@bounds = Box.new(Vector[*origin], Vector[*size])
+			end
+			
+			return @bounds
+		end
+		
 		attr :points
 		
 		def hash_for_coordinates(coordinates)
-			integral = @bounds.to_integral(coordinates, @scale)
-			
-			return Hilbert.hash(*integral, @order)
+			@function.map(coordinates)
 		end
 		
 		def point_for_hash(hash)
-			integral = Hilbert.unhash(hash, @order)
-			coordinates = @bounds.from_integral(integral, @scale)
-			
-			return Point.new(self, Location.new(*coordinates))
+			Point.new(self, @function.unmap(hash))
 		end
 		
-		def point_for_location(location)
-			Point.new(self, location)
+		def point_for_coordinates(coordinates, object = nil)
+			Point.new(self, coordinates, object)
 		end
 		
-		def << location
-			@points << point_for_location(location)
+		def << object
+			@points << point_for_coordinates(object.to_a, object)
 			
 			return self
 		end
@@ -92,11 +112,11 @@ module Geospatial
 		def query(region, **options)
 			filter = filter_for(region, **options)
 			
-			return filter.apply(@points).map(&:location)
+			return filter.apply(@points).map(&:object)
 		end
 		
 		def traverse(region, depth: 0)
-			Hilbert.traverse(@order, origin: @bounds.origin, size: @bounds.size) do |child_origin, child_size, prefix, order|
+			@function.traverse do |child_origin, child_size, prefix, order|
 				child = Box.new(Vector[*child_origin], Vector[*child_size])
 				
 				# puts "Considering (order=#{order}) #{child.inspect}..."

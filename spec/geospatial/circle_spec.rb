@@ -80,7 +80,7 @@ module Geospatial::CircleSpec
 				pdf.fill_color "00ff00"
 				
 				map.points.each do |point|
-					center =  [origin[0] + point.location.longitude, origin[1] + point.location.latitude]
+					center =  [origin[0] + point[0], origin[1] + point[1]]
 					pdf.circle center, 0.1
 				end
 				
@@ -91,7 +91,7 @@ module Geospatial::CircleSpec
 		end
 		
 		it "can generate visualisation" do
-			map = Geospatial::Map.new
+			map = Geospatial::Map.for_earth
 			
 			map << lake_tekapo
 			

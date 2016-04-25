@@ -18,23 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'geospatial/index'
+require 'geospatial/dimension'
 
-module Geospatial::IndexSpec
-	describe Geospatial::Index do
-		let(:lake_alex) {Geospatial::Location.new(170.45, -43.94)}
-		let(:point) {Geospatial::Index.map.point_for_coordinates(lake_alex.to_a)}
-		
-		it "should dump to hash" do
-			expect(Geospatial::Index.dump(point)).to be == point.hash
+module Geospatial::DimensionSpec
+	describe Geospatial::Dimension do
+		it "should map values" do
+			expect(Geospatial::LONGITUDE.map(-180)).to be == 0.0
+			expect(Geospatial::LONGITUDE.map(0)).to be == 0.5
+			expect(Geospatial::LONGITUDE.map(180)).to be == 1.0
 		end
 		
-		it "should load hash" do
-			truncated_point = Geospatial::Index.load(point.hash)
-			distance = Geospatial::Location.new(*truncated_point.coordinates).distance_from(lake_alex)
-			
-			# The distance between the truncated point and the original point should be < 10 meters.
-			expect(distance).to be < 10
+		it "should unmap values" do
+			expect(Geospatial::LONGITUDE.unmap(0.0)).to be == -180
+			expect(Geospatial::LONGITUDE.unmap(0.5)).to be == 0
+			expect(Geospatial::LONGITUDE.unmap(1.0)).to be == 180
 		end
 	end
 end

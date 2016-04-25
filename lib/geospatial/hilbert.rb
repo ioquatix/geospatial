@@ -18,8 +18,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require_relative 'filter'
+
 module Geospatial
-	module Hilbert
+	class Hilbert
 		# Order is the index of the 2-bit pair which indexes into the 2x2 quadrants.
 		# Order | Size
 		# 0     | 2x2
@@ -185,14 +187,12 @@ module Geospatial
 			end
 		end
 		
-		# Enumerate a depth first traversal of the hilbert curve from the top of the tree down.
-		def self.traverse(order, rotation = A, origin: [0, 0], size: [1, 1], &block)
-			value = 0
-			
+		# This is a helper entry point for traversing Hilbert space.
+		def self.traverse(order, rotation = A, origin:, size:, &block)
 			if block_given?
-				self.traverse_recurse(order, rotation, value, origin, size, &block)
+				self.traverse_recurse(order, rotation, 0, origin, size, &block)
 			else
-				return to_enum(:traverse_recurse, order, rotation, value, origin, size, &block)
+				self.to_enum(:traverse_recurse, order, rotation, 0, origin, size)
 			end
 		end
 		
@@ -222,6 +222,55 @@ module Geospatial
 			end
 			
 			return value
+		end
+		
+		def initialize(dimensions, order = 20)
+			raise ArgumentError("Order #{order} must be positive integer!") unless order >= 1
+			
+			@order = order
+			@scale = 2**(@order+1)
+			
+			@dimensions = dimensions.collect{|dimension| dimension * @scale}
+			@origin = Vector[*dimensions.collect(&:origin)]
+			@size = Vector[*dimensions.collect(&:size)]
+			
+			@rotation = A
+		end
+		
+		attr :order
+		attr :scale
+		attr :dimensions
+		attr :rotation
+		
+		# This is a helper entry point for traversing Hilbert space.
+		def self.traverse(order, rotation = A, origin:, size:, &block)
+			if block_given?
+				self.traverse_recurse(order, rotation, 0, origin, size, &block)
+			else
+				self.to_enum(:traverse_recurse, order, rotation, 0, origin, size)
+			end
+		end
+		
+		# This is a helper entry point for traversing Hilbert space.
+		def traverse(&block)
+			if block_given?
+				self.class.traverse_recurse(@order, @rotation, 0, @origin, @size, &block)
+			else
+				self.class.to_enum(:traverse_recurse, @order, @rotation, 0, @origin, @size)
+			end
+		end
+		
+		def map(coordinates)
+			x = @dimensions[0].map(coordinates[0]).floor
+			y = @dimensions[1].map(coordinates[1]).floor
+			
+			return Hilbert.hash(x, y, @order, @rotation)
+		end
+		
+		def unmap(value)
+			x, y = Hilbert.unhash(value, @order, @rotation)
+			
+			return @dimensions[0].unmap(x), @dimensions[1].unmap(y)
 		end
 	end
 end
