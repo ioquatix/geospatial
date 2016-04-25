@@ -22,6 +22,9 @@ require_relative 'filter'
 
 module Geospatial
 	class Hilbert
+		# I'd like to investigate this implementation to see if it is an improvement on this approach:
+		# http://stackoverflow.com/questions/499166/mapping-n-dimensional-value-to-a-point-on-hilbert-curve
+		
 		# Order is the index of the 2-bit pair which indexes into the 2x2 quadrants.
 		# Order | Size
 		# 0     | 2x2
