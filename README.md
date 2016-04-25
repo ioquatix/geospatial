@@ -37,7 +37,7 @@ The simplest way to use this library is to use the built in `Map`:
 	map << Geospatial::Location.new(170.45, -43.94) # Lake Alex, New Zealand.
 	map << Geospatial::Location.new(151.21, -33.85) # Sydney, Australia.
 
-	map.sort!
+	map.sort! # or assume an ordered database index.
 
 	new_zealand = Geospatial::Box.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])
 
@@ -45,7 +45,7 @@ The simplest way to use this library is to use the built in `Map`:
 	expect(points).to include(lake_tekapo, lake_alex)
 	expect(points).to_not include(sydney)
 
-At a lower level you can use the method in the `Geospatial::Hilbert` module to `hash`, `unhash` and `traverse` the Hilbert mapping.
+At a lower level you can use the method in the `Geospatial::Hilbert` module to `hash`, `unhash` and `traverse` the Hilbert mapping. As of now, only 2 dimentional mappings are supported but 3+ dimensions may be supported in the future (e.g. geo temporal indexing using a single column).
 
 ## Contributing
 

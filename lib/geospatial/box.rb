@@ -95,19 +95,5 @@ module Geospatial
 			
 			return true
 		end
-		
-		# def to_integral(location, scale)
-		# 	[
-		# 		((location[0] - @origin[0]).to_f / @size[0] * scale).floor,
-		# 		((location[1] - @origin[1]).to_f / @size[1] * scale).floor,
-		# 	]
-		# end
-		# 
-		# def from_integral(coordinate, scale)
-		# 	[
-		# 		@origin[0] + (coordinate[0].to_f / scale) * @size[0],
-		# 		@origin[1] + (coordinate[1].to_f / scale) * @size[1],
-		# 	]
-		# end
 	end
 end
