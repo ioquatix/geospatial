@@ -130,7 +130,7 @@ module Geospatial
 			
 			n = a / Math::sqrt(1.0-e*e*(Math::sin(lat) ** 2))
 			# alt = p / Math::cos(lat)-n
-	
+			
 			return self.new(lat*R2D, lon*R2D)
 		end
 		

@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 require_relative 'filter'
+require_relative 'dimension'
 
 module Geospatial
 	class Hilbert

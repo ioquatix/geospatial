@@ -30,14 +30,16 @@ module Geospatial
 			def load(hash)
 				if hash
 					map.point_for_hash(hash)
-				else
-					
 				end
 			end
 			
 			def dump(point)
-				if point and !point.nil?
+				if point.is_a?(Point)
 					point.hash
+				elsif point.respond_to?(:to_a)
+					map.hash_for_coordinates(point.to_a)
+				elsif !point.nil?
+					raise ArgumentError.new("Could not convert #{point} on #{map}!")
 				end
 			end
 		end
