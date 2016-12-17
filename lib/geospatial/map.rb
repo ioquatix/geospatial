@@ -55,27 +55,25 @@ module Geospatial
 	
 	class Map
 		def self.for_earth
-			self.new(Hilbert.new([LONGITUDE, LATITUDE]))
+			self.new(Hilbert::Curve.new(Dimensions.for_earth))
 		end
 		
-		def initialize(function)
-			@function = function
-			
+		def initialize(curve)
+			@curve = curve
 			@points = []
-			
 			@bounds = nil
 		end
 		
 		def order
-			@function.order
+			@curve.order
 		end
 		
 		def bounds
 			unless @bounds
-				origin = @function.dimensions.collect(&:origin)
-				size = @function.dimensions.collect(&:size)
+				origin = @curve.origin
+				size = @curve.size
 				
-				@bounds = Box.new(Vector[*origin], Vector[*size])
+				@bounds = Box.new(origin, size)
 			end
 			
 			return @bounds
@@ -84,11 +82,11 @@ module Geospatial
 		attr :points
 		
 		def hash_for_coordinates(coordinates)
-			@function.map(coordinates)
+			@curve.map(coordinates)
 		end
 		
 		def point_for_hash(hash)
-			Point.new(self, @function.unmap(hash))
+			Point.new(self, @curve.unmap(hash))
 		end
 		
 		def point_for_coordinates(coordinates, object = nil)
@@ -116,7 +114,7 @@ module Geospatial
 		end
 		
 		def traverse(region, depth: 0)
-			@function.traverse do |child_origin, child_size, prefix, order|
+			@curve.traverse do |child_origin, child_size, prefix, order|
 				child = Box.new(Vector[*child_origin], Vector[*child_size])
 				
 				# puts "Considering (order=#{order}) #{child.inspect}..."

@@ -23,9 +23,7 @@ require 'geospatial/map'
 require 'prawn'
 
 module Geospatial::MapSpec
-	HILBERT_EARTH = Geospatial::Hilbert.new([Geospatial::LONGITUDE, Geospatial::LATITUDE])
-	
-	describe Geospatial::Map.new(HILBERT_EARTH) do
+	describe Geospatial::Map.for_earth do
 		let(:lake_tekapo) {Geospatial::Location.new(170.53, -43.89)}
 		let(:lake_alex) {Geospatial::Location.new(170.45, -43.94)}
 		let(:sydney) {Geospatial::Location.new(151.21, -33.85)}

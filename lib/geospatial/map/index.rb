@@ -18,47 +18,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-require 'matrix'
+require_relative '../map'
 
 module Geospatial
-	# An integral dimension which maps a continuous space into an integral space. The scale is the maximum integral unit.
-	class Dimension
-		def initialize(origin, size, scale = 1.0)
-			@origin = origin
-			@size = size
-			@scale = scale
+	class Map
+		# Uses dependency injection to generate a class to `load` and `dump` a serialized column.
+		class Index
+			class << self
+				attr_accessor :map
+				
+				def load(hash)
+					if hash
+						map.point_for_hash(hash)
+					end
+				end
+				
+				def dump(point)
+					if point.is_a?(Point)
+						point.hash
+					elsif point.respond_to?(:to_a)
+						map.hash_for_coordinates(point.to_a)
+					elsif !point.nil?
+						raise ArgumentError.new("Could not convert #{point} on #{map}!")
+					end
+				end
+			end
 		end
 		
-		def * factor
-			self.class.new(@origin, @size, @scale * factor)
-		end
-		
-		attr :origin
-		attr :size
-		attr :scale
-		
-		def min
-			@origin
-		end
-		
-		def max
-			@origin + @size
-		end
-		
-		def integral?
-			false
-		end
-		
-		# Normalize the value into the range 0..1 and then multiply by scale and floor to get an integral value.
-		def map(value)
-			((value - @origin).to_f / @size) * @scale
-		end
-		
-		def unmap(value)
-			@origin + (value / @scale) * @size
+		# serialize :point, Map.for_earth.index
+		def index
+			klass = Class.new(Index)
+			
+			klass.map = self
+			
+			return klass
 		end
 	end
-	
-	LATITUDE = Dimension.new(-90.0, 180.0)
-	LONGITUDE = Dimension.new(-180.0, 360.0)
 end
