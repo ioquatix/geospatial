@@ -42,3 +42,22 @@ RSpec.describe Geospatial::Hilbert::Curve do
 		expect(prefixes).to be_sorted
 	end
 end
+
+RSpec.describe Geospatial::Hilbert::Curve do
+	let(:order) {4}
+	let(:divisions) {2**order}
+	let(:dimensions) {Geospatial::Dimensions.from_ranges(0..divisions, 0..divisions)}
+	subject {Geospatial::Hilbert::Curve.new(dimensions, order)}
+	
+	it "traverses and generates valid matching hashes" do
+		subject.traverse do |origin, size, prefix, depth|
+			if depth == 0
+				index = Geospatial::OrdinalIndex.new(origin.collect(&:to_i), order).to_hilbert
+				
+				# puts "Child origin=#{origin.inspect} prefix=#{prefix.to_s(2)} order=#{order}"
+				
+				expect(prefix).to be == index.to_i
+			end
+		end
+	end
+end
