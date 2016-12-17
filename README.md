@@ -45,7 +45,13 @@ The simplest way to use this library is to use the built in `Map`:
 	expect(points).to include(lake_tekapo, lake_alex)
 	expect(points).to_not include(sydney)
 
-At a lower level you can use the method in the `Geospatial::Hilbert` module to `hash`, `unhash` and `traverse` the Hilbert mapping. As of now, only 2 dimentional mappings are supported but 3+ dimensions may be supported in the future (e.g. geo temporal indexing using a single column).
+At a lower level you can use the method in the `Geospatial::Hilbert` module to `map`, `unmap` and `traverse` the Hilbert mapping.
+
+### Geotemporal Indexes
+
+The Hilbert curve is multi-dimensional and therefore can represent multi-dimensional data, e.g. latitude, longitude and time, in a single index. The curve expands uniformly in all dimensions, so you can't control the precision of the dimensions independently.
+
+Mathematically speaking, it's possible to compose curves together to form curves of different precision/properties. However, how these fit together generally is a bit more complex, especially in terms of exploring the curve via traversal.
 
 ## Contributing
 
@@ -59,7 +65,7 @@ At a lower level you can use the method in the `Geospatial::Hilbert` module to `
 
 Released under the MIT license.
 
-Copyright, 2015, by [Samuel G. D. Williams](http://www.codeotaku.com/samuel-williams).
+Copyright, 2016, by [Samuel G. D. Williams](http://www.codeotaku.com/samuel-williams).
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
