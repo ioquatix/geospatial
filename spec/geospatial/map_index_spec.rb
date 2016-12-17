@@ -21,7 +21,7 @@
 require 'geospatial/map/index'
 
 RSpec.describe Geospatial::Map::Index do
-	let(:map) {Geospatial::Map.for_earth}
+	let(:map) {Geospatial::Map.for_earth(30)}
 	let(:subject) {map.index}
 	
 	let(:lake_alex) {Geospatial::Location.new(170.45, -43.94)}

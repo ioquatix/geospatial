@@ -21,7 +21,7 @@
 require_relative 'location'
 require_relative 'box'
 require_relative 'filter'
-require_relative 'hilbert'
+require_relative 'hilbert/traverse'
 
 module Geospatial
 	# A point is a location on a map with a specific hash representation based on the map. A point might store multi-dimentional data (e.g. longitude, latitude, time) which is hashed to a single column.
@@ -54,8 +54,8 @@ module Geospatial
 	end
 	
 	class Map
-		def self.for_earth
-			self.new(Hilbert::Curve.new(Dimensions.for_earth))
+		def self.for_earth(order = 20)
+			self.new(Hilbert::Curve.new(Dimensions.for_earth, order))
 		end
 		
 		def initialize(curve)
@@ -115,7 +115,7 @@ module Geospatial
 		
 		def traverse(region, depth: 0)
 			@curve.traverse do |child_origin, child_size, prefix, order|
-				child = Box.new(Vector[*child_origin], Vector[*child_size])
+				child = Box.new(Vector.elements(child_origin), Vector.elements(child_size))
 				
 				# puts "Considering (order=#{order}) #{child.inspect}..."
 				
@@ -124,13 +124,13 @@ module Geospatial
 						# puts "at bottom -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
 						yield(child, prefix, order); :skip
 					elsif region.include?(child)
-						#puts "include child -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
+						# puts "include child -> found prefix #{prefix.to_s(2)} (#{child.inspect})"
 						yield(child, prefix, order); :skip
 					else
-						#puts "going deeper..."
+						# puts "going deeper..."
 					end
 				else
-					#puts "out of bounds."
+					# puts "out of bounds."
 					:skip
 				end
 			end

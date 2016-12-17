@@ -122,5 +122,9 @@ module Geospatial
 		def self.for_earth
 			@for_earth ||= self.new([LONGITUDE, LATITUDE]).freeze
 		end
+		
+		def self.from_ranges(*ranges)
+			self.new ranges.collect{|range| Dimension.new(range.min, range.max - range.min)}
+		end
 	end
 end

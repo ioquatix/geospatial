@@ -38,6 +38,10 @@ module Geospatial
 		attr :axes
 		attr :bits
 		
+		def & mask
+			self.class.new(axes.collect{|axis| axis & mask}, @bits)
+		end
+		
 		def hash
 			@axes.hash
 		end
