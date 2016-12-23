@@ -22,8 +22,31 @@ require 'matrix'
 
 module Geospatial
 	class Box
-		def self.from_bounds(min, max)
-			self.new(min, max-min, max)
+		class << self
+			def from_bounds(min, max)
+				self.new(min, max-min, max)
+			end
+			
+			alias [] from_bounds
+			
+			def enclosing_points(points)
+				return nil unless points.any?
+				
+				min = points.first.to_a
+				max = points.first.to_a
+				
+				points.each do |point|
+					point.each_with_index do |value, index|
+						if value < min[index]
+							min[index] = value
+						elsif value > max[index]
+							max[index] = value
+						end
+					end
+				end
+				
+				return self.from_bounds(Vector.elements(min), Vector.elements(max))
+			end
 		end
 		
 		def initialize(origin, size, max = nil)
@@ -41,8 +64,8 @@ module Geospatial
 		attr :origin
 		attr :size
 		
-		def inspect
-			"#{self.class}(#{min.inspect} -> #{max.inspect})"
+		def to_s
+			"#{self.class}[#{min.inspect}, #{max.inspect}]"
 		end
 		
 		def min

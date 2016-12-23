@@ -23,6 +23,8 @@ require 'matrix'
 module Geospatial
 	# A circle is a geometric primative where the center is a location and the radius is in meters.
 	class Circle
+		alias [] new
+		
 		# Center must be a vector, radius must be a numeric value.
 		def initialize(center, radius)
 			@center = center
@@ -32,8 +34,8 @@ module Geospatial
 		attr :center
 		attr :radius
 		
-		def inspect
-			"#{self.class}(#{@center} -> #{@radius})"
+		def to_s
+			"#{self.class}[#{@center}, #{@radius}]"
 		end
 		
 		def distance_from(point)
