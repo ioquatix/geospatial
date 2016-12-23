@@ -78,6 +78,8 @@ module Geospatial
 		
 		# This yields the four corners of the box.
 		def corners
+			return to_enum(:corners) unless block_given?
+			
 			yield(@origin)
 			
 			max = self.max
@@ -88,6 +90,8 @@ module Geospatial
 		
 		# This yields the midpoints of the four sides of the box.
 		def midpoints
+			return to_enum(:midpoints) unless block_given?
+			
 			size = self.size
 			
 			yield(Vector[@origin[0] + size[0] / 2, @origin[1]])

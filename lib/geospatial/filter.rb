@@ -29,7 +29,7 @@ module Geospatial
 			attr :min
 			attr :max
 			
-			def inspect
+			def to_s
 				"#{min.to_s(2)}..#{max.to_s(2)}"
 			end
 			

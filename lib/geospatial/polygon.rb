@@ -90,5 +90,26 @@ module Geospatial
 			
 			self.winding_number(point) == 1
 		end
+		
+		def intersect_with_box?(other)
+			return true if @points.any?{|point| other.include_point?(point)}
+			
+			return true if other.corners.any?{|corner| self.include_point?(corner)}
+			
+			return false
+		end
+		
+		def intersect?(other)
+			case other
+			when Box
+				intersect_with_box?(other)
+			when Circle
+				intersect_with_circle?(other)
+			end
+		end
+		
+		def include?(other)
+			other.corners.all?{|corner| self.include_point?(corner)}
+		end
 	end
 end

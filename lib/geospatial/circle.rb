@@ -23,7 +23,9 @@ require 'matrix'
 module Geospatial
 	# A circle is a geometric primative where the center is a location and the radius is in meters.
 	class Circle
-		alias [] new
+		class << self
+			alias [] new
+		end
 		
 		# Center must be a vector, radius must be a numeric value.
 		def initialize(center, radius)
