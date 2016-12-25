@@ -93,6 +93,10 @@ module Geospatial
 			Point.new(self, coordinates, object)
 		end
 		
+		def point_for_object(object)
+			Point.new(self, object.to_a, object)
+		end
+		
 		def << object
 			@points << point_for_coordinates(object.to_a, object)
 			

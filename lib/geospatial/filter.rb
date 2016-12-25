@@ -68,9 +68,15 @@ module Geospatial
 			end
 		end
 		
-		def apply(objects)
+		def apply(points)
 			# This is a poor implementation.
-			objects.select{|object| @ranges.any?{|range| range.include?(object.hash)}}
+			points.select{|point| @ranges.any?{|range| range.include?(point.hash)}}
+		end
+		
+		alias & apply
+		
+		def include?(point)
+			@ranges.any?{|range| range.include?(point.hash)}
 		end
 	end
 end
