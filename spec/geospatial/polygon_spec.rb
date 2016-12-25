@@ -20,8 +20,7 @@
 
 require 'geospatial/polygon'
 
-require 'geospatial/map'
-require 'prawn'
+require_relative 'visualization'
 
 RSpec.shared_context "kaikoura region" do
 	let(:region) do
@@ -70,51 +69,12 @@ end
 RSpec.describe Geospatial::Polygon do
 	include_context "kaikoura region"
 	
-	def visualise(map)
-		margin = 10
-		scale = 16.0
-		size = map.bounds.size.to_a
-		half_size = size.map{|i| i.to_f / 2}
-		origin = [size[0] / 2, size[1] / 2]
-		
-		pdf = Prawn::Document.new(
-			page_size: [(size[0] + 40) * scale, (size[1] + 40) * scale],
-			margin: 20,
-		)
-		
-		pdf.line_width 0.001
-		pdf.scale(scale)
-		
-		world_path = File.expand_path("world.png", __dir__)
-		pdf.image world_path, :at => [0, 180], width: 360, height: 180
-		
-		pdf.stroke_axis(step_length: 45)
-		
-		pdf.transparent(0.3, 0.9) do
-			pdf.stroke_color "000000"
-			pdf.fill_color "00abcc"
-			
-			yield pdf, Vector[*origin]
-		
-			pdf.fill_color "00ff00"
-			
-			map.points.each do |point|
-				center =  [origin[0] + point[0], origin[1] + point[1]]
-				pdf.circle center, 0.1
-			end
-			
-			pdf.fill
-		end
-		
-		pdf.render_file "polygon.pdf"
-	end
-	
 	it "can generate visualisation" do
 		map = Geospatial::Map.for_earth
 		
 		map << kaikoura
 		
-		visualise(map) do |pdf, origin|
+		Geospatial::Visualization.for_map(map) do |pdf, origin|
 			region.edges do |pa, pb|
 				pdf.line (origin + pa).to_a, (origin + pb).to_a
 			end
@@ -131,6 +91,6 @@ RSpec.describe Geospatial::Polygon do
 			#puts "count=#{count}"
 			
 			pdf.fill_and_stroke
-		end
+		end.render_file "polygon.pdf"
 	end
 end
