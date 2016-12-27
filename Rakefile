@@ -6,3 +6,14 @@ RSpec::Core::RakeTask.new(:spec) do |task|
 end
 
 task :default => :spec
+
+task :console do
+	require 'pry'
+	
+	$LOAD_PATH.unshift(File.expand_path('lib', __dir__))
+	
+	require 'geospatial'
+	require 'geospatial/hilbert'
+	
+	Pry.start
+end
