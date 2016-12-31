@@ -25,13 +25,13 @@ require_relative 'visualization'
 RSpec.shared_context "kaikoura region" do
 	let(:region) do
 		Geospatial::Polygon[
-			Vector[173.7218528654108, -42.32817252073923],
-			Vector[173.6307775307161, -42.32729039137249],
-			Vector[173.5400659958715, -42.39758413896335],
-			Vector[173.5446498680837, -42.43847509799515],
-			Vector[173.6833471779081, -42.44870319335309],
-			Vector[173.7608096128163, -42.42144813099029],
-			Vector[173.7218528654108, -42.32817252073923],
+		  Vector[173.7218528654108, -42.32817252073923],
+		  Vector[173.6307775307161, -42.32729039137249],
+		  Vector[173.5400659958715, -42.39758413896335],
+		  Vector[173.5446498680837, -42.43847509799515],
+		  Vector[173.6833471779081, -42.44870319335309],
+		  Vector[173.7608096128163, -42.42144813099029],
+		  Vector[173.7218528654108, -42.32817252073923],
 		]
 	end
 	
@@ -69,8 +69,14 @@ end
 RSpec.describe Geospatial::Polygon do
 	include_context "kaikoura region"
 	
+	it "generates correct number of ranges" do
+		map = Geospatial::Map.for_earth(30)
+		filter = map.filter_for(region, depth: 12)
+		expect(filter.ranges.count).to be 166
+	end
+	
 	it "can generate visualisation" do
-		map = Geospatial::Map.for_earth
+		map = Geospatial::Map.for_earth(30)
 		
 		map << kaikoura
 		
@@ -79,16 +85,16 @@ RSpec.describe Geospatial::Polygon do
 				pdf.line (origin + pa).to_a, (origin + pb).to_a
 			end
 			
-			#count = 0
-			map.traverse(region, depth: map.order - 15) do |child, prefix, order|
-				#count += 1
+			count = 0
+			map.traverse(region, depth: 12) do |child, prefix, order|
+				count += 1
 				size = child.size
 				top_left = (origin + child.min) + Vector[0, size[1]]
 				pdf.rectangle(top_left.to_a, *size.to_a)
 				# puts "#{top_left.to_a} #{size.to_a}"
 			end
 			
-			#puts "count=#{count}"
+			# puts "count=#{count}"
 			
 			pdf.fill_and_stroke
 		end.render_file "polygon.pdf"
