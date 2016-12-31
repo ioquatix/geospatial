@@ -36,7 +36,7 @@ RSpec.describe Geospatial::Map.for_earth(30) do
 		map = Geospatial::Map.for_earth(30)
 		filter = map.filter_for(kaikoura_polygon, depth: 12)
 		
-		puts "filter.ranges.count: #{filter.ranges.count}"
+		#puts "filter.ranges.count: #{filter.ranges.count}"
 		
 		#ranges.each_with_index do |(min, max), index|
 		#	puts "#{min} -> #{max} :: #{filter.ranges[index].min} -> #{filter.ranges[index].max}"
@@ -45,7 +45,7 @@ RSpec.describe Geospatial::Map.for_earth(30) do
 		location = Geospatial::Location[176.204319, -37.660294]
 		point = map.point_for_object(location)
 		
-		puts map.hash_for_coordinates(location.to_a)
+		#puts map.hash_for_coordinates(location.to_a)
 		# 888186547785722805
 		# 888900599658148001
 		
