@@ -20,17 +20,23 @@
 
 require 'geospatial/location'
 
-module Geospatial::LocationSpec
-	describe Geospatial::Location do
-		let(:lake_tekapo) {Geospatial::Location.new(170.53, -43.89)}
-		let(:lake_alex) {Geospatial::Location.new(170.45, -43.94)}
-		
-		it "compute the correct distance between two points" do
-			expect(lake_alex.distance_from(lake_tekapo)).to be_within(100).of(8_500)
-		end
-		
-		it "should format nicely" do
-			expect("#{lake_alex}").to be == "Geospatial::Location[170.45, -43.94]"
-		end
+RSpec.describe Geospatial::Location do
+	let(:lake_tekapo) {Geospatial::Location.new(170.53, -43.89)}
+	let(:lake_alex) {Geospatial::Location.new(170.45, -43.94)}
+	
+	it "compute the correct distance between two points" do
+		expect(lake_alex.distance_from(lake_tekapo)).to be_within(100).of(8_500)
+	end
+	
+	it "should format nicely" do
+		expect("#{lake_alex}").to be == "Geospatial::Location[170.45, -43.94]"
+	end
+end
+
+require 'bigdecimal'
+
+RSpec.describe Geospatial::Location[BigDecimal.new("170.45"), BigDecimal.new("-43.94")] do
+	it "should format nicely" do
+		expect("#{subject}").to be == "Geospatial::Location[170.45, -43.94]"
 	end
 end

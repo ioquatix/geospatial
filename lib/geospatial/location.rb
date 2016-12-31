@@ -83,7 +83,7 @@ module Geospatial
 		end
 		
 		def to_s
-			"#{self.class}#{self.to_a.inspect}"
+			"#{self.class}[#{self.longitude.to_f}, #{self.latitude.to_f}]"
 		end
 		
 		alias inspect to_s
