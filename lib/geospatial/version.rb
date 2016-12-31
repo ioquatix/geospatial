@@ -19,5 +19,5 @@
 # THE SOFTWARE.
 
 module Geospatial
-	VERSION = "1.1.2"
+	VERSION = "1.1.3"
 end
