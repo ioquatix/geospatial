@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+require_relative 'distance'
+
 module Geospatial
 	# This location is specifically relating to a WGS84 coordinate on Earth.
 	class Location
