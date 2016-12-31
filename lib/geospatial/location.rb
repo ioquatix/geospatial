@@ -83,7 +83,7 @@ module Geospatial
 		end
 		
 		def to_s
-			"#{self.class}#{self.to_a}"
+			"#{self.class}#{self.to_a.inspect}"
 		end
 		
 		alias inspect to_s
