@@ -44,6 +44,8 @@ module Geospatial
 		
 		attr :coordinates
 		
+		alias to_a coordinates
+		
 		def eql?(other)
 			self.class.eql?(other.class) and @coordinates.eql?(other.coordinates)
 		end
@@ -143,6 +145,7 @@ module Geospatial
 		def filter_for(region, **options)
 			filter = Filter.new
 			
+			# The filter will coalesce sequential segments of the curve into a single range.
 			traverse(region, **options) do |child, prefix, order|
 				filter.add(prefix, order)
 			end
