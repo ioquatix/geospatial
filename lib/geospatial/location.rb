@@ -42,10 +42,34 @@ module Geospatial
 		MIN_LATITUDE = -90.0 * D2R
 		MAX_LATITUDE = 90 * D2R
 		VALID_LATITUDE = MIN_LATITUDE...MAX_LATITUDE
-
+		
+		class << self
+			def from_ecef(x, y, z)
+				# Constants (WGS ellipsoid)
+				a = WGS84_A
+				e = WGS84_E
+		
+				b = Math::sqrt((a*a) * (1.0-(e*e)))
+				ep = Math::sqrt(((a*a)-(b*b))/(b*b))
+				
+				p = Math::sqrt((x*x)+(y*y))
+				th = Math::atan2(a*z, b*p)
+				
+				lon = Math::atan2(y, x)
+				lat = Math::atan2((z+ep*ep*b*(Math::sin(th) ** 3)), (p-e*e*a*(Math::cos(th)**3)))
+				
+				n = a / Math::sqrt(1.0-e*e*(Math::sin(lat) ** 2))
+				# alt = p / Math::cos(lat)-n
+				
+				return self.new(lat*R2D, lon*R2D)
+			end
+			
+			alias [] new
+		end
+		
 		def initialize(longitude, latitude)
-			@latitude = latitude
 			@longitude = longitude
+			@latitude = latitude
 		end
 		
 		def valid?
@@ -57,7 +81,7 @@ module Geospatial
 		end
 		
 		def to_s
-			"#<Location longitude=#{@longitude.to_f} latitude=#{@latitude}>"
+			"#{self.class}#{self.to_a}"
 		end
 		
 		alias inspect to_s
@@ -113,34 +137,14 @@ module Geospatial
 	
 			return x, y, z
 		end
-	
-		def self.from_ecef(x, y, z)
-			# Constants (WGS ellipsoid)
-			a = WGS84_A
-			e = WGS84_E
-	
-			b = Math::sqrt((a*a) * (1.0-(e*e)))
-			ep = Math::sqrt(((a*a)-(b*b))/(b*b))
-			
-			p = Math::sqrt((x*x)+(y*y))
-			th = Math::atan2(a*z, b*p)
-			
-			lon = Math::atan2(y, x)
-			lat = Math::atan2((z+ep*ep*b*(Math::sin(th) ** 3)), (p-e*e*a*(Math::cos(th)**3)))
-			
-			n = a / Math::sqrt(1.0-e*e*(Math::sin(lat) ** 2))
-			# alt = p / Math::cos(lat)-n
-			
-			return self.new(lat*R2D, lon*R2D)
-		end
 		
 		# calculate distance in metres between us and something else
 		# ref: http://codingandweb.blogspot.co.nz/2012/04/calculating-distance-between-two-points.html
-		def distance_from(other_position)
+		def distance_from(other)
 			rlong1 = self.longitude * D2R 
 			rlat1 = self.latitude * D2R 
-			rlong2 = other_position.longitude * D2R 
-			rlat2 = other_position.latitude * D2R 
+			rlong2 = other.longitude * D2R 
+			rlat2 = other.latitude * D2R 
 			
 			dlon = rlong1 - rlong2
 			dlat = rlat1 - rlat2
@@ -150,6 +154,10 @@ module Geospatial
 			d = EARTH_RADIUS * c
 			
 			return d
+		end
+		
+		def - other
+			Distance.new(self.distance_from(other))
 		end
 	end
 end
