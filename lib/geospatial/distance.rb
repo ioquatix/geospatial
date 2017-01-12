@@ -21,6 +21,8 @@
 module Geospatial
 	# This location is specifically relating to a WGS84 coordinate on Earth.
 	class Distance
+		include Comparable
+		
 		# Distance in meters:
 		def initialize(value)
 			@value = value
@@ -75,6 +77,10 @@ module Geospatial
 		
 		def == other
 			@value == other.to_f
+		end
+		
+		def <=> other
+			@value <=> other.to_f
 		end
 	end
 end

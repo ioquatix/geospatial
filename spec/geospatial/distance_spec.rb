@@ -44,4 +44,9 @@ RSpec.describe Geospatial::Distance.new(10000) do
 	it "can subtract distances" do
 		expect(subject - 100).to be == 9900.0
 	end
+	
+	it "can sort distances" do
+		expect([subject, subject*2, subject*3].min).to be == subject
+		expect([subject, subject*2, subject*3].max).to be == (subject*3)
+	end
 end
