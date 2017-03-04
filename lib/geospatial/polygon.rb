@@ -28,8 +28,10 @@ module Geospatial
 		
 		def initialize(points)
 			@points = points
-			@box = nil
+			@bounding_box = nil
 		end
+		
+		attr :points
 		
 		def to_s
 			"#{self.class}#{@points.inspect}"

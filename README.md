@@ -14,6 +14,8 @@ We had a need to query a database of places efficiently using SQLite. We did som
 
 After researching geospatial hashing algorithms, I found [this blog post](http://blog.notdot.net/2009/11/Damn-Cool-Algorithms-Spatial-indexing-with-Quadtrees-and-Hilbert-Curves) and decided to implement a geospatial hash using the Hilbert curve. This library exposes a fast indexing and querying mechanism based on Hilbert curves, for points on a map, which can be integrated into a database or other systems as required.
 
+For another solution to this problem, Google uses [S2 Geometry](http://blog.christianperone.com/2015/08/googles-s2-geometry-on-the-sphere-cells-and-hilbert-curve/) which is a more specific implementation designed for geospatial indexes only.
+
 ## Installation
 
 Add this line to your application's Gemfile:
