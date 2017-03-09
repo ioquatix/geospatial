@@ -20,8 +20,6 @@
 
 require_relative 'curve'
 
-require 'pry'
-
 module Geospatial
 	module Hilbert
 		class Curve

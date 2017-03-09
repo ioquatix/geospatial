@@ -20,6 +20,7 @@
 
 require_relative '../dimensions'
 require_relative '../index'
+require_relative 'traverse'
 
 module Geospatial
 	module Hilbert
