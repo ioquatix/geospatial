@@ -34,18 +34,20 @@ Or install it yourself as:
 
 The simplest way to use this library is to use the built in `Map`:
 
-	map = Geospatial::Map.new
-	map << Geospatial::Location.new(170.53, -43.89) # Lake Tekapo, New Zealand.
-	map << Geospatial::Location.new(170.45, -43.94) # Lake Alex, New Zealand.
-	map << Geospatial::Location.new(151.21, -33.85) # Sydney, Australia.
+```ruby
+map = Geospatial::Map.new
+map << Geospatial::Location.new(170.53, -43.89) # Lake Tekapo, New Zealand.
+map << Geospatial::Location.new(170.45, -43.94) # Lake Alex, New Zealand.
+map << Geospatial::Location.new(151.21, -33.85) # Sydney, Australia.
 
-	map.sort! # or assume an ordered database index.
+map.sort! # or assume an ordered database index.
 
-	new_zealand = Geospatial::Box.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])
+new_zealand = Geospatial::Box.from_bounds(Vector[166.0, -48.0], Vector[180.0, -34.0])
 
-	points = subject.query(new_zealand)
-	expect(points).to include(lake_tekapo, lake_alex)
-	expect(points).to_not include(sydney)
+points = subject.query(new_zealand)
+expect(points).to include(lake_tekapo, lake_alex)
+expect(points).to_not include(sydney)
+```
 
 At a lower level you can use the method in the `Geospatial::Hilbert` module to `map`, `unmap` and `traverse` the Hilbert mapping.
 
@@ -53,7 +55,7 @@ At a lower level you can use the method in the `Geospatial::Hilbert` module to `
 
 The Hilbert curve is multi-dimensional and therefore can represent multi-dimensional data, e.g. latitude, longitude and time, in a single index. The curve expands uniformly in all dimensions, so you can't control the precision of the dimensions independently.
 
-Mathematically speaking, it's possible to compose curves together to form curves of different precision/properties. However, how these fit together generally is a bit more complex, especially in terms of exploring the curve via traversal.
+Mathematically speaking, it's possible to [compose curves together](https://github.com/cne1x/sfseize) to form curves of different precision/properties. However, how these fit together generally is a bit more complex, especially in terms of exploring the curve via traversal.
 
 ## Contributing
 
