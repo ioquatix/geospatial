@@ -46,6 +46,10 @@ module Geospatial
 		VALID_LATITUDE = MIN_LATITUDE...MAX_LATITUDE
 		
 		class << self
+			def [] (longitude:, latitude:)
+				self.new(longitude, latitude)
+			end
+			
 			def from_ecef(x, y, z)
 				# Constants (WGS ellipsoid)
 				a = WGS84_A
