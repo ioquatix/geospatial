@@ -51,6 +51,20 @@ expect(points).to_not include(sydney)
 
 At a lower level you can use the method in the `Geospatial::Hilbert` module to `map`, `unmap` and `traverse` the Hilbert mapping.
 
+### Computing a Hilbert Index
+
+```ruby
+#!/usr/bin/env ruby
+require 'geospatial/map'
+require 'geospatial/dimensions'
+require 'geospatial/hilbert/curve'
+
+map = Geospatial::Map.for_earth(30)
+coordinate = ARGV.collect(&:to_f)
+index = map.hash_for_coordinates(coordinate)
+puts index
+```
+
 ### Geotemporal Indexes
 
 The Hilbert curve is multi-dimensional and therefore can represent multi-dimensional data, e.g. latitude, longitude and time, in a single index. The curve expands uniformly in all dimensions, so you can't control the precision of the dimensions independently.
