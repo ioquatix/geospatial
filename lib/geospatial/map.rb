@@ -21,7 +21,8 @@
 require_relative 'location'
 require_relative 'box'
 require_relative 'filter'
-require_relative 'hilbert/traverse'
+
+require_relative 'hilbert/curve'
 
 module Geospatial
 	# A point is a location on a map with a specific hash representation based on the map. A point might store multi-dimentional data (e.g. longitude, latitude, time) which is hashed to a single column.

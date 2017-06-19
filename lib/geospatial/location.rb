@@ -46,10 +46,6 @@ module Geospatial
 		VALID_LATITUDE = MIN_LATITUDE...MAX_LATITUDE
 		
 		class << self
-			def [] (longitude:, latitude:)
-				self.new(longitude, latitude)
-			end
-			
 			def from_ecef(x, y, z)
 				# Constants (WGS ellipsoid)
 				a = WGS84_A
@@ -64,7 +60,7 @@ module Geospatial
 				lon = Math::atan2(y, x)
 				lat = Math::atan2((z+ep*ep*b*(Math::sin(th) ** 3)), (p-e*e*a*(Math::cos(th)**3)))
 				
-				n = a / Math::sqrt(1.0-e*e*(Math::sin(lat) ** 2))
+				# n = a / Math::sqrt(1.0-e*e*(Math::sin(lat) ** 2))
 				# alt = p / Math::cos(lat)-n
 				
 				return self.new(lat*R2D, lon*R2D)

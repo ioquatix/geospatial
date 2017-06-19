@@ -1,5 +1,5 @@
 
-require 'geospatial/hilbert/traverse'
+require 'geospatial/hilbert/curve'
 
 require_relative 'sorted'
 

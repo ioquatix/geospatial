@@ -20,7 +20,6 @@
 
 require_relative '../dimensions'
 require_relative '../index'
-require_relative 'traverse'
 
 module Geospatial
 	module Hilbert
@@ -55,10 +54,38 @@ module Geospatial
 			
 			# This is a helper entry point for traversing Hilbert space.
 			def traverse(&block)
-				if block_given?
-					self.class.traverse_recurse(@order, @rotation, 0, @origin, @size, &block)
-				else
-					self.class.to_enum(:traverse_recurse, @order, @rotation, 0, @origin, @size)
+				return to_enum(:traverse) unless block_given?
+				
+				traverse_recurse(@order-1, 0, 0, self.origin, self.size, &block)
+			end
+			
+			def bit_width
+				@dimensions.count
+			end
+			
+			# Traversal enumerates all regions of a curve, top-down.
+			def traverse_recurse(order, mask, value, origin, size, &block)
+				half_size = size.collect{|value| value * 0.5}.freeze
+				prefix_mask = (1 << order) | mask
+				
+				(2**bit_width).times do |prefix|
+					# These both do the same thing, not sure which one is faster:
+					child_value = (value << @dimensions.count) | prefix
+					prefix = child_value << (order*bit_width)
+					
+					index = HilbertIndex.from_integral(prefix, bit_width, @order).to_ordinal
+					
+					index = index & prefix_mask
+					
+					child_origin = @dimensions.unmap(index.axes).freeze
+					
+					# puts "yield(#{child_origin}, #{half_size}, #{prefix}, #{order})"
+					# We avoid calling traverse_recurse simply to hit the callback on the leaf nodes:
+					result = yield child_origin, half_size, prefix, order
+					
+					if order > 0 and result != :skip
+						self.traverse_recurse(order - 1, prefix_mask, child_value, child_origin, half_size, &block)
+					end
 				end
 			end
 			
