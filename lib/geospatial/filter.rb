@@ -52,8 +52,9 @@ module Geospatial
 			end
 		end
 		
-		def initialize
+		def initialize(curve)
 			@ranges = []
+			@curve = curve
 		end
 		
 		attr :ranges
@@ -77,6 +78,43 @@ module Geospatial
 		
 		def include?(point)
 			@ranges.any?{|range| range.include?(point.hash)}
+		end
+		
+		def each(depth: 0)
+			# TODO using a range tree might allow a significantly improved implementation.
+			@curve.traverse do |child_origin, child_size, prefix, order|
+				child = Box.new(Vector.elements(child_origin), Vector.elements(child_size))
+				
+				# puts "Considering (order=#{order}) #{child.inspect}..."
+				
+				min = prefix
+				max = prefix | ((1 << (order*2)) - 1)
+				
+				if min_range = find(min)
+					if order == depth # at bottom
+						yield(child, prefix, order); :skip
+					elsif min_range.include?(max)
+						# This range completely contains the current prefix/order
+						yield(child, prefix, order); :skip
+					else
+						# go deeper
+					end
+				elsif max_range = find(max)
+					if order == depth # at bottom
+						yield(child, prefix, order); :skip
+					else
+						# go deeper
+					end
+				elsif sub_range = @ranges.find{|range| range.min >= min && range.max <= max}
+					# go deeper
+				else
+					:skip # out of bounds
+				end
+			end
+		end
+		
+		def find(hash)
+			@ranges.find{|range| range.include?(hash)}
 		end
 	end
 end

@@ -67,6 +67,8 @@ module Geospatial
 			@bounds = nil
 		end
 		
+		attr :curve
+		
 		def order
 			@curve.order
 		end
@@ -144,7 +146,7 @@ module Geospatial
 		end
 		
 		def filter_for(region, **options)
-			filter = Filter.new
+			filter = Filter.new(@curve)
 			
 			# The filter will coalesce sequential segments of the curve into a single range.
 			traverse(region, **options) do |child, prefix, order|
