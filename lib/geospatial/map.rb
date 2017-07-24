@@ -145,12 +145,14 @@ module Geospatial
 			end
 		end
 		
-		def filter_for(region, **options)
+		def filter_for(*regions, **options)
 			filter = Filter.new(@curve)
 			
-			# The filter will coalesce sequential segments of the curve into a single range.
-			traverse(region, **options) do |child, prefix, order|
-				filter.add(prefix, order)
+			regions.each do |region|
+				# The filter will coalesce sequential segments of the curve into a single range.
+				traverse(region, **options) do |child, prefix, order|
+					filter.add(prefix, order)
+				end
 			end
 			
 			return filter
