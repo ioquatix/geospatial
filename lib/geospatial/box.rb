@@ -88,6 +88,10 @@ module Geospatial
 			yield(Vector[@origin[0], max[1]])
 		end
 		
+		def center
+			@origin + (@size/2)
+		end
+		
 		# This yields the midpoints of the four sides of the box.
 		def midpoints
 			return to_enum(:midpoints) unless block_given?
