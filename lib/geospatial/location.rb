@@ -167,7 +167,7 @@ module Geospatial
 			return Math::atan2(
 				Math::sin(lon2 - lon1) * Math::cos(lat2),
 				Math::cos(lat1) * Math::sin(lat2) - Math::sin(lat1) * Math::cos(lat2) * Math::cos(lon2-lon1)
-			)
+			) * R2D
 		end
 		
 		def - other
