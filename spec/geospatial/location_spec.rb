@@ -39,11 +39,11 @@ RSpec.describe Geospatial::Location do
 		let(:east) {Geospatial::Location.new(10, 0)}
 		
 		it "should compute the bearing between two points" do
-			expect(east.bearing_from(west) * Geospatial::Location::R2D).to be_within(0.1).of(90)
+			expect(east.bearing_from(west)).to be_within(0.1).of(90)
 		end
 		
 		it "should compute the bearing between two points" do
-			expect(west.bearing_from(east) * Geospatial::Location::R2D).to be_within(0.1).of(-90)
+			expect(west.bearing_from(east)).to be_within(0.1).of(-90)
 		end
 	end
 	
@@ -52,11 +52,11 @@ RSpec.describe Geospatial::Location do
 		let(:south) {Geospatial::Location.new(0, -10)}
 		
 		it "should compute the bearing between two points" do
-			expect(north.bearing_from(south) * Geospatial::Location::R2D).to be_within(0.1).of(0)
+			expect(north.bearing_from(south)).to be_within(0.1).of(0)
 		end
 		
 		it "should compute the bearing between two points" do
-			expect(south.bearing_from(north) * Geospatial::Location::R2D).to be_within(0.1).of(180)
+			expect(south.bearing_from(north)).to be_within(0.1).of(180)
 		end
 	end
 end
