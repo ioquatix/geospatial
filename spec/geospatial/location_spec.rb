@@ -21,15 +21,43 @@
 require 'geospatial/location'
 
 RSpec.describe Geospatial::Location do
-	let(:lake_tekapo) {Geospatial::Location.new(170.53, -43.89)}
-	let(:lake_alex) {Geospatial::Location.new(170.45, -43.94)}
-	
-	it "compute the correct distance between two points" do
-		expect(lake_alex.distance_from(lake_tekapo)).to be_within(100).of(8_500)
+	context 'new zealand lakes' do
+		let(:lake_tekapo) {Geospatial::Location.new(170.53, -43.89)}
+		let(:lake_alex) {Geospatial::Location.new(170.45, -43.94)}
+		
+		it "should compute the correct distance between two points" do
+			expect(lake_alex.distance_from(lake_tekapo)).to be_within(100).of(8_500)
+		end
+		
+		it "should format nicely" do
+			expect("#{lake_alex}").to be == "Geospatial::Location[170.45, -43.94]"
+		end
 	end
 	
-	it "should format nicely" do
-		expect("#{lake_alex}").to be == "Geospatial::Location[170.45, -43.94]"
+	context 'points on equator' do
+		let(:west) {Geospatial::Location.new(-10, 0)}
+		let(:east) {Geospatial::Location.new(10, 0)}
+		
+		it "should compute the bearing between two points" do
+			expect(east.bearing_from(west) * Geospatial::Location::R2D).to be_within(0.1).of(90)
+		end
+		
+		it "should compute the bearing between two points" do
+			expect(west.bearing_from(east) * Geospatial::Location::R2D).to be_within(0.1).of(-90)
+		end
+	end
+	
+	context 'points on same latitude' do
+		let(:north) {Geospatial::Location.new(0, 10)}
+		let(:south) {Geospatial::Location.new(0, -10)}
+		
+		it "should compute the bearing between two points" do
+			expect(north.bearing_from(south) * Geospatial::Location::R2D).to be_within(0.1).of(0)
+		end
+		
+		it "should compute the bearing between two points" do
+			expect(south.bearing_from(north) * Geospatial::Location::R2D).to be_within(0.1).of(180)
+		end
 	end
 end
 

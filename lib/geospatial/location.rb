@@ -158,6 +158,18 @@ module Geospatial
 			return d
 		end
 		
+		def bearing_from(other)
+			lon1 = other.longitude * D2R 
+			lat1 = other.latitude * D2R 
+			lon2 = self.longitude * D2R 
+			lat2 = self.latitude * D2R 
+			
+			return Math::atan2(
+				Math::sin(lon2 - lon1) * Math::cos(lat2),
+				Math::cos(lat1) * Math::sin(lat2) - Math::sin(lat1) * Math::cos(lat2) * Math::cos(lon2-lon1)
+			)
+		end
+		
 		def - other
 			Distance.new(self.distance_from(other))
 		end
