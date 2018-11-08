@@ -23,8 +23,16 @@ module Geospatial
 		attr :offset
 		attr :scale
 		
+		def map(value)
+			((value - @min) / @scale)
+		end
+		
+		def unmap(index)
+			@min + ((index + 0.5) * @scale)
+		end
+		
 		def add(value, amount = 1)
-			index = ((value - @min) / @scale).floor
+			index = map(value).floor
 			
 			if @bins[index]
 				@bins[index] += amount
@@ -35,22 +43,22 @@ module Geospatial
 			return self
 		end
 		
-		def peaks
-			@bins.each_with_index
-		end
-		
-		def offset(index)
-			@min + (index * @scale)
-		end
-		
 		def inspect
 			buffer = String.new("\#<#{self.class}")
 			
 			@bins.each_with_index do |bin, index|
-				buffer << "\n#{offset(index).to_s.rjust(8)}: #{bin}"
+				buffer << "\n#{unmap(index).to_s.rjust(8)}: #{bin}"
 			end
 			
 			buffer << "\n>"
+		end
+		
+		def each
+			return to_enum unless block_given?
+			
+			@bins.each_with_index do |value, index|
+				yield unmap(index), value
+			end
 		end
 	end
 	
@@ -65,5 +73,4 @@ module Geospatial
 			super(point.bearing_from(@center), value)
 		end
 	end
-		
 end
