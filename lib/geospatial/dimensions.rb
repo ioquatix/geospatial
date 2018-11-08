@@ -23,6 +23,10 @@ require 'matrix'
 module Geospatial
 	# An integral dimension which maps a continuous space into an integral space. The scale is the maximum integral unit.
 	class Dimension
+		def self.map(min, max, steps)
+			self.new(min, max-min, steps)
+		end
+		
 		def initialize(origin, size, scale = 1.0)
 			@origin = origin
 			@size = size
