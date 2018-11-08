@@ -32,6 +32,11 @@ RSpec.describe Geospatial::Location do
 		it "should format nicely" do
 			expect("#{lake_alex}").to be == "Geospatial::Location[170.45, -43.94]"
 		end
+		
+		it "should have equivalence" do
+			expect(lake_tekapo).to be == lake_tekapo
+			expect(lake_alex).to_not be == lake_tekapo
+		end
 	end
 	
 	context 'points on equator' do

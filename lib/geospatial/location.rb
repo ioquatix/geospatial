@@ -87,8 +87,18 @@ module Geospatial
 			to_a
 		end
 		
+		def to_h
+			{latitude: @latitude, longitude: @longitude}
+		end
+		
 		def to_s
 			"#{self.class}[#{self.longitude.to_f}, #{self.latitude.to_f}]"
+		end
+		
+		include Comparable
+		
+		def <=> other
+			to_a <=> other.to_a
 		end
 		
 		alias inspect to_s
