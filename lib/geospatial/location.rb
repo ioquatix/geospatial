@@ -28,7 +28,8 @@ module Geospatial
 		# WGS 84 semi-minor axis constant in meters
 		WGS84_B = 6356752.3
 		
-		EARTH_RADIUS = (WGS84_A + WGS84_B) / 2.0
+		# Earth Radius
+		R = (WGS84_A + WGS84_B) / 2.0
 		
 		# WGS 84 eccentricity
 		WGS84_E = 8.1819190842622e-2
@@ -82,6 +83,10 @@ module Geospatial
 			[@longitude, @latitude]
 		end
 		
+		def to_ary
+			to_a
+		end
+		
 		def to_s
 			"#{self.class}[#{self.longitude.to_f}, #{self.latitude.to_f}]"
 		end
@@ -92,7 +97,7 @@ module Geospatial
 		attr :latitude # -90 -> 90 (equivalent to y)
 		
 		# http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
-		def bounding_box(distance, radius = EARTH_RADIUS)
+		def bounding_box(distance, radius = R)
 			raise ArgumentError.new("Invalid distance or radius") if distance < 0 or radius < 0
 
 			# angular distance in radians on a great circle
@@ -153,7 +158,7 @@ module Geospatial
 			
 			a = Math::sin(dlat/2) ** 2 + Math::cos(rlat1) * Math::cos(rlat2) * Math::sin(dlon/2) ** 2
 			c = 2 * Math::atan2(Math::sqrt(a), Math::sqrt(1-a))
-			d = EARTH_RADIUS * c
+			d = R * c
 			
 			return d
 		end
@@ -168,6 +173,17 @@ module Geospatial
 				Math::sin(lon2 - lon1) * Math::cos(lat2),
 				Math::cos(lat1) * Math::sin(lat2) - Math::sin(lat1) * Math::cos(lat2) * Math::cos(lon2-lon1)
 			) * R2D
+		end
+		
+		def location_by(bearing, distance)
+			lon1 = self.longitude * D2R
+			lat1 = self.latitude * D2R
+			
+			lat2 = Math::asin(Math::sin(lat1)*Math::cos(distance/R) + Math::cos(lat1)*Math::sin(distance/R)*Math::cos(bearing * D2R))
+			
+			lon2 = lon1 + Math::atan2(Math::sin(bearing * D2R)*Math::sin(distance/R)*Math::cos(lat1), Math::cos(distance/R)-Math::sin(lat1)*Math::sin(lat2))
+			
+			return self.class.new(lon2 * R2D, lat2 * R2D)
 		end
 		
 		def - other
