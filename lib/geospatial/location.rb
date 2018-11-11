@@ -158,10 +158,10 @@ module Geospatial
 		# calculate distance in metres between us and something else
 		# ref: http://codingandweb.blogspot.co.nz/2012/04/calculating-distance-between-two-points.html
 		def distance_from(other)
-			rlong1 = self.longitude * D2R 
-			rlat1 = self.latitude * D2R 
-			rlong2 = other.longitude * D2R 
-			rlat2 = other.latitude * D2R 
+			rlong1 = self.longitude * D2R
+			rlat1 = self.latitude * D2R
+			rlong2 = other.longitude * D2R
+			rlat2 = other.latitude * D2R
 			
 			dlon = rlong1 - rlong2
 			dlat = rlat1 - rlat2
