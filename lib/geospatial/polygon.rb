@@ -26,9 +26,9 @@ module Geospatial
 			self.new(points)
 		end
 		
-		def initialize(points)
+		def initialize(points, bounding_box = nil)
 			@points = points
-			@bounding_box = nil
+			@bounding_box = bounding_box
 		end
 		
 		attr :points
@@ -38,7 +38,7 @@ module Geospatial
 		end
 		
 		def bounding_box
-			@bounding_box ||= Box.enclosing_points(@points)
+			@bounding_box ||= Box.enclosing_points(@points).freeze
 		end
 		
 		def freeze
@@ -56,6 +56,20 @@ module Geospatial
 				yield previous, point
 				previous = point
 			end
+		end
+		
+		def simplify(minimum_distance = 1)
+			simplified_points = @points.first(1)
+			
+			@points.each do |point|
+				distance = (point - simplified_points.last).magnitude
+				
+				if distance > minimum_distance
+					simplified_points << point
+				end
+			end
+			
+			self.new(simplified_points, bounding_box)
 		end
 		
 		def self.is_left(p0, p1, p2)
@@ -99,6 +113,20 @@ module Geospatial
 			return true if other.corners.any?{|corner| self.include_point?(corner)}
 			
 			return false
+		end
+		
+		def edge_intersection(a, b)
+			line = Line.new(a, b)
+			
+			edges.each_with_index do |pa, pb, i|
+				edge = Line.new(pa, pb)
+				
+				if line.intersect?(edge)
+					return i
+				end
+			end
+			
+			return nil
 		end
 		
 		def intersect?(other)
