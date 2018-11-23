@@ -7,12 +7,16 @@
 module Geospatial
 	# This location is specifically relating to a WGS84 coordinate on Earth.
 	class Histogram
-		def initialize(min: 0, max: 1, scale: 0.1)
+		def initialize(min: 0, max: 1, scale: 0.1, items: true)
 			@min = min
 			@max = max
 			@scale = scale
 			
 			@count = 0
+			
+			if items
+				@items = Hash.new{|h,k| h[k] = Array.new}
+			end
 			
 			@size = ((@max - @min) / @scale).ceil
 			@bins = [0] * @size
@@ -20,7 +24,8 @@ module Geospatial
 			@scale = scale
 		end
 		
-		attr_accessor :bins
+		attr :bins
+		attr :items
 		
 		attr :count
 		
@@ -43,12 +48,16 @@ module Geospatial
 			@min + (index * @scale)
 		end
 		
-		def add(value, amount = 1)
+		def add(value, amount = 1, item: nil)
 			index = map(value).floor % @size
 			
 			if !block_given? or yield(index, value)
 				@count += 1
 				@bins[index] += amount
+				
+				if @items and item
+					@items[index] << item
+				end
 			end
 			
 			return index
@@ -124,16 +133,21 @@ module Geospatial
 			end
 		end
 		
+		def peaks
+			self.class.new(@derivative)
+		end
+		
 		def segments
 			return to_enum(:segments) unless block_given?
 			
-			gradients = self.to_a
+			peaks = self.peaks
+			gradients = peaks.to_a
 			
 			return if gradients.empty?
 			
 			index, gradient = gradients.first
 			
-			if gradient < 0
+			if gradient > 0
 				gradients.push gradients.shift
 			end
 			
