@@ -32,6 +32,12 @@ module Geospatial
 		attr :offset
 		attr :scale
 		
+		def bins= bins
+			raise ArgumentError, "Incorrect length" unless bins.size == @size
+			
+			@bins = bins
+		end
+		
 		def [] index
 			@bins[index]
 		end
