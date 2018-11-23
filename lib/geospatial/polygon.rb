@@ -26,12 +26,31 @@ module Geospatial
 			self.new(points)
 		end
 		
+		def self.load(data)
+			if data
+				self.new(JSON.parse(data).map{|point| Vector.elements(point)})
+			end
+		end
+		
+		def self.dump(polygon)
+			if polygon
+				JSON.dump(polygon.points.map(&:to_a))
+			end
+		end
+		
 		def initialize(points, bounding_box = nil)
 			@points = points
 			@bounding_box = bounding_box
 		end
 		
 		attr :points
+		
+		def [] index
+			a = @points[index.floor]
+			b = @points[index.ceil % @points.size]
+			
+			return a + (b - a) * (index % 1.0)
+		end
 		
 		def to_s
 			"#{self.class}#{@points.inspect}"
@@ -51,10 +70,10 @@ module Geospatial
 		def edges
 			return to_enum(:edges) unless block_given?
 			
-			previous = @points.last
-			@points.each do |point|
-				yield previous, point
-				previous = point
+			size = @points.size
+			
+			@points.each_with_index do |point, index|
+				yield point, @points[(index+1)%size]
 			end
 		end
 		
@@ -62,14 +81,12 @@ module Geospatial
 			simplified_points = @points.first(1)
 			
 			@points.each do |point|
-				distance = (point - simplified_points.last).magnitude
-				
-				if distance > minimum_distance
+				if yield(simplified_points.last, point)
 					simplified_points << point
 				end
 			end
 			
-			self.new(simplified_points, bounding_box)
+			self.class.new(simplified_points, bounding_box)
 		end
 		
 		def self.is_left(p0, p1, p2)
@@ -118,7 +135,7 @@ module Geospatial
 		def edge_intersection(a, b)
 			line = Line.new(a, b)
 			
-			edges.each_with_index do |pa, pb, i|
+			edges.each_with_index do |(pa, pb), i|
 				edge = Line.new(pa, pb)
 				
 				if line.intersect?(edge)
