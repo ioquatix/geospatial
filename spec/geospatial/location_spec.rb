@@ -25,6 +25,11 @@ RSpec.describe Geospatial::Location do
 		let(:lake_tekapo) {Geospatial::Location.new(170.53, -43.89)}
 		let(:lake_alex) {Geospatial::Location.new(170.45, -43.94)}
 		
+		it "should be valid" do
+			expect(lake_tekapo).to be_valid
+			expect(lake_alex).to be_valid
+		end
+		
 		it "should compute the correct distance between two points" do
 			expect(lake_alex.distance_from(lake_tekapo)).to be_within(100).of(8_500)
 		end
