@@ -77,6 +77,24 @@ module Geospatial
 			end
 		end
 		
+		# @param [Float] radius The radius of the sphere on which to compute the area.
+		def area(radius = 1.0)
+			if @points.size > 2
+				area = 0.0
+				
+				self.edges.each do |p1, p2|
+					r1 = (p2[0] - p1[0]) * D2R
+					r2 = 2 + Math::sin(p1[1] * D2R) + Math::sin(p2[1] * D2R)
+					
+					area += r1 * r2
+				end
+				
+				return (area * radius * radius / 2.0).abs
+			else
+				return 0.0
+			end
+		end
+		
 		def simplify(minimum_distance = 1)
 			simplified_points = @points.first(1)
 			
