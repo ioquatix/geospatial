@@ -121,7 +121,7 @@ module Geospatial
 			count = 0
 			
 			edges.each do |pa, pb|
-				if pa[1] <= p[1] 
+				if pa[1] <= p[1]
 					if pb[1] >= p[1] and Polygon.is_left(pa, pb, p) > 0
 						count += 1
 					end
@@ -139,7 +139,7 @@ module Geospatial
 		def include_point?(point)
 			return false unless bounding_box.include_point?(point)
 			
-			self.winding_number(point) == 1
+			self.winding_number(point).odd?
 		end
 		
 		def intersect_with_box?(other)
