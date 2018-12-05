@@ -21,31 +21,31 @@
 require_relative 'distance'
 
 module Geospatial
+	# WGS 84 semi-major axis constant in meters
+	WGS84_A = 6378137.0
+	# WGS 84 semi-minor axis constant in meters
+	WGS84_B = 6356752.3
+	
+	# Earth Radius
+	R = (WGS84_A + WGS84_B) / 2.0
+	
+	# WGS 84 eccentricity
+	WGS84_E = 8.1819190842622e-2
+
+	# Radians to degrees multiplier
+	R2D = (180.0 / Math::PI)
+	D2R = (Math::PI / 180.0)
+
+	MIN_LONGITUDE = -180.0 * D2R
+	MAX_LONGITUDE = 180.0 * D2R
+	VALID_LONGITUDE = -180.0...180.0
+
+	MIN_LATITUDE = -90.0 * D2R
+	MAX_LATITUDE = 90.0 * D2R
+	VALID_LATITUDE = -90.0...90.0
+	
 	# This location is specifically relating to a WGS84 coordinate on Earth.
 	class Location
-		# WGS 84 semi-major axis constant in meters
-		WGS84_A = 6378137.0
-		# WGS 84 semi-minor axis constant in meters
-		WGS84_B = 6356752.3
-		
-		# Earth Radius
-		R = (WGS84_A + WGS84_B) / 2.0
-		
-		# WGS 84 eccentricity
-		WGS84_E = 8.1819190842622e-2
-
-		# Radians to degrees multiplier
-		R2D = (180.0 / Math::PI)
-		D2R = (Math::PI / 180.0)
-
-		MIN_LONGITUDE = -180.0 * D2R
-		MAX_LONGITUDE = 180.0 * D2R
-		VALID_LONGITUDE = -180.0...180.0
-
-		MIN_LATITUDE = -90.0 * D2R
-		MAX_LATITUDE = 90.0 * D2R
-		VALID_LATITUDE = -90.0...90.0
-		
 		class << self
 			def from_ecef(x, y, z)
 				# Constants (WGS ellipsoid)
