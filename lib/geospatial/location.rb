@@ -173,6 +173,7 @@ module Geospatial
 			return d
 		end
 		
+		# @return [Numeric] bearing in degrees.
 		def bearing_from(other)
 			lon1 = other.longitude * D2R 
 			lat1 = other.latitude * D2R 
@@ -185,6 +186,8 @@ module Geospatial
 			) * R2D
 		end
 		
+		# @param distance [Numeric] distance in meters.
+		# @param bearing [Numeric] bearing in degrees.
 		def location_by(bearing, distance)
 			lon1 = self.longitude * D2R
 			lat1 = self.latitude * D2R
