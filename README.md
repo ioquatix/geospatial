@@ -76,10 +76,10 @@ Mathematically speaking, it's possible to [compose curves together](https://gith
 ### Finding the distance between two locations
 
 ```ruby
-laketekapo = Geospatial::Location.new(170.53, -43.89) # Lake Tekapo, New Zealand.
-lakealex = Geospatial::Location.new(170.45, -43.94) # Lake Alex, New Zealand.
-distance = lakealex.distance_from(laketekapo)
-puts distance #8479.056408162045 Metres
+lake_tekapo = Geospatial::Location.new(170.53, -43.89) # Lake Tekapo, New Zealand.
+lake_alex = Geospatial::Location.new(170.45, -43.94) # Lake Alex, New Zealand.
+distance = lake_alex.distance_from(lake_tekapo)
+puts distance # 8479.056408162045 meters
 ```
 
 ## Contributing
