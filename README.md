@@ -73,6 +73,15 @@ The Hilbert curve is multi-dimensional and therefore can represent multi-dimensi
 
 Mathematically speaking, it's possible to [compose curves together](https://github.com/cne1x/sfseize) to form curves of different precision/properties. However, how these fit together generally is a bit more complex, especially in terms of exploring the curve via traversal.
 
+### Finding the distance between two locations
+
+```ruby
+laketekapo = Geospatial::Location.new(170.53, -43.89) # Lake Tekapo, New Zealand.
+lakealex = Geospatial::Location.new(170.45, -43.94) # Lake Alex, New Zealand.
+distance = lakealex.distance_from(laketekapo)
+puts distance #8479.056408162045 Metres
+```
+
 ## Contributing
 
 1. Fork it
