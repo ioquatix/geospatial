@@ -98,8 +98,10 @@ module Geospatial
 		def simplify(minimum_distance = 1)
 			simplified_points = @points.first(1)
 			
-			@points.each do |point|
-				if yield(simplified_points.last, point)
+			@points.each_with_index do |point, index|
+				next_point = @points[(index+1) % @points.size]
+				
+				if yield(simplified_points.last, point, next_point)
 					simplified_points << point
 				end
 			end
