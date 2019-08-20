@@ -105,12 +105,25 @@ RSpec.describe Geospatial::Polygon do
 	end
 end
 
-RSpec.shared_context "visualize polygon" do
+RSpec.shared_context "visualize polygon" do |depth = 12|
 	it "can generate visualisation" do
 		map = Geospatial::Map.for_earth(30)
 		
 		coordinates = region_string.split(/\s+/).collect{|coordinate| Vector.elements(coordinate.split(',').collect(&:to_f).first(2))}
 		region = Geospatial::Polygon.new(coordinates)
+		
+		maximum_distance = 100_000
+		
+		region = region.subdivide do |a, b|
+			a = Geospatial::Location.new(*a)
+			b = Geospatial::Location.new(*b)
+			
+			distance = a.distance_from(b)
+			
+			if distance > maximum_distance
+				a.midpoints_to(b, (distance / maximum_distance).ceil).map{|p| Vector[*p]}
+			end
+		end
 		
 		Geospatial::Visualization.for_map(map) do |pdf, origin|
 			region.edges do |pa, pb|
@@ -118,15 +131,23 @@ RSpec.shared_context "visualize polygon" do
 			end
 			
 			count = 0
-			map.traverse(region, depth: 12) do |child, prefix, order|
+			map.traverse(region, depth: depth) do |child, prefix, order|
 				count += 1
 				size = child.size
 				top_left = (origin + child.min) + Vector[0, size[1]]
 				pdf.rectangle(top_left.to_a, *size.to_a)
-				# puts "#{top_left.to_a} #{size.to_a}"
+				# $stderr.puts "#{top_left.to_a} #{size.to_a}"
 			end
 			
-			# puts "count=#{count}"
+			# $stderr.puts "count=#{count}"
+			
+			pdf.fill_and_stroke
+			
+			pdf.fill_color 'aaaaff'
+			
+			region.points.each do |p|
+				pdf.fill_circle((origin + p).to_a, 0.01)
+			end
 			
 			pdf.fill_and_stroke
 		end.render_file "#{self.class.description}.pdf"
@@ -143,4 +164,11 @@ RSpec.describe "Whanganui Polygon" do
 	let(:region_string) {"175.0556233581592,-39.89861688271326,0 175.0212702693783,-39.91563023046992,0 174.9982107080192,-39.94106068540562,0 175.0189791159102,-39.95883189352543,0 175.0380433179273,-39.9568297441058,0 175.0580033463029,-39.94526078572716,0 175.0686808831414,-39.92828589884596,0 175.0760889571864,-39.90493548576401,0 175.0556233581592,-39.89861688271326,0"}
 	
 	include_context "visualize polygon"
+end
+
+
+RSpec.describe "New Zealand Bounding Box" do
+	let(:region_string) {"165.7930426042,-47.8671059558 179.1461410947,-47.8671059558 179.1461410947,-33.4566032676 165.7930426042,-33.4566032676"}
+	
+	include_context "visualize polygon", 20
 end

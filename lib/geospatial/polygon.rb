@@ -113,6 +113,8 @@ module Geospatial
 		
 		# @example
 		# polygon.subdivide do |a, b|
+		#		a = Geospatial::Location.new(*a)
+		#		b = Geospatial::Location.new(*b)
 		# 	if a.distance_from(b) > maximum_distance
 		# 		a.midpoints(b, 2)
 		# 	end
@@ -120,16 +122,18 @@ module Geospatial
 		def subdivide
 			simplified_points = @points.first(1)
 			
-			(1...@points.size).each do |index|
-				point = @points[index]
-				
+			(1..@points.size).each do |index|
+				point = @points[index % @points.size]
 				next_point = @points[(index+1) % @points.size]
 				
 				if points = yield(simplified_points.last, point, next_point)
 					simplified_points.concat(points)
 				end
 				
-				simplified_points << point
+				# Polygons are represented by a closed sequence of points, but we need to subdivide by the last point at the first point too. However, we don't add the first point a 2nd time.
+				if index < @points.size
+					simplified_points << point
+				end
 			end
 			
 			self.class.new(simplified_points, bounding_box)
