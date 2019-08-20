@@ -98,7 +98,9 @@ module Geospatial
 		def simplify
 			simplified_points = @points.first(1)
 			
-			@points.each_with_index do |point, index|
+			(1...@points.size).each do |index|
+				point = @points[index]
+				
 				next_point = @points[(index+1) % @points.size]
 				
 				if yield(simplified_points.last, point, next_point)
@@ -118,14 +120,16 @@ module Geospatial
 		def subdivide
 			simplified_points = @points.first(1)
 			
-			@points.each_with_index do |point, index|
+			(1...@points.size).each do |index|
+				point = @points[index]
+				
 				next_point = @points[(index+1) % @points.size]
 				
 				if points = yield(simplified_points.last, point, next_point)
 					simplified_points.concat(points)
-				else
-					simplified_points << point
 				end
+				
+				simplified_points << point
 			end
 			
 			self.class.new(simplified_points, bounding_box)
