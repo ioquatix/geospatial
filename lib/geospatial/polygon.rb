@@ -95,13 +95,35 @@ module Geospatial
 			end
 		end
 		
-		def simplify(minimum_distance = 1)
+		def simplify
 			simplified_points = @points.first(1)
 			
 			@points.each_with_index do |point, index|
 				next_point = @points[(index+1) % @points.size]
 				
 				if yield(simplified_points.last, point, next_point)
+					simplified_points << point
+				end
+			end
+			
+			self.class.new(simplified_points, bounding_box)
+		end
+		
+		# @example
+		# polygon.subdivide do |a, b|
+		# 	if a.distance_from(b) > maximum_distance
+		# 		a.midpoints(b, 2)
+		# 	end
+		# end
+		def subdivide
+			simplified_points = @points.first(1)
+			
+			@points.each_with_index do |point, index|
+				next_point = @points[(index+1) % @points.size]
+				
+				if points = yield(simplified_points.last, point, next_point)
+					simplified_points.concat(points)
+				else
 					simplified_points << point
 				end
 			end

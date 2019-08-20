@@ -69,6 +69,29 @@ RSpec.describe Geospatial::Location do
 			expect(south.bearing_from(north)).to be_within(0.1).of(180)
 		end
 	end
+	
+	describe '#midpoints_to' do
+		let(:north) {Geospatial::Location.new(10, 10)}
+		let(:south) {Geospatial::Location.new(-10, -10)}
+		
+		it "can generate one midpoint" do
+			midpoints = north.midpoints_to(south, 4).to_a
+			
+			expect(midpoints.size).to be == 3
+			
+			expect(midpoints[0].distance_from(
+				Geospatial::Location.new(4.9616, 5.0190)
+			)).to be < 10
+			
+			expect(midpoints[1].distance_from(
+				Geospatial::Location.new(0, 0)
+			)).to be < 10
+			
+			expect(midpoints[2].distance_from(
+				Geospatial::Location.new(-4.9616, -5.0190)
+			)).to be < 10
+		end
+	end
 end
 
 require 'bigdecimal'

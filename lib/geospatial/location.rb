@@ -202,5 +202,20 @@ module Geospatial
 		def - other
 			Distance.new(self.distance_from(other))
 		end
+		
+		# Compute count midpoints between self and other.
+		# @param count [Integer] the number of segments to generate.
+		def midpoints_to(other, count)
+			return to_enum(:midpoints_to, other, count) unless block_given?
+			
+			distance = other.distance_from(self)
+			bearing = other.bearing_from(self)
+			
+			step = distance / count
+			
+			(1...count).each do |i|
+				yield self.location_by(bearing, step * i)
+			end
+		end
 	end
 end
