@@ -19,6 +19,8 @@
 # THE SOFTWARE.
 
 require_relative 'box'
+require_relative 'line'
+require_relative 'circle'
 
 module Geospatial
 	class Polygon
